@@ -6,8 +6,6 @@
 
 using namespace std;
 
-map<string, string> Config::configs_;
-
 void Config::add(const pair<string, string>& config) {
 	configs_[config.first] = config.second;
 }
@@ -54,4 +52,8 @@ void Config::parse(const string& filename) {
 
 void Config::clear() {
 	configs_.clear();
+}
+
+map<string, string>& Config::internal() {
+	return configs_;
 }

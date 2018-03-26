@@ -9,11 +9,13 @@ struct NoConfigException {
 
 class Config {
 public:
-	static void parse(const std::string& filename);
-	static void clear();
+	void parse(const std::string& filename);
+	void clear();
+	
+	std::map<std::string, std::string>& internal();
 	
 	template<class T>
-	static T get(const std::string& key) {
+	T get(const std::string& key) {
 		auto iterator = configs_.find(key);
 		
 		if (iterator == configs_.end())
@@ -27,9 +29,9 @@ public:
 	}
 	
 private:
-	static void add(const std::pair<std::string, std::string>& config);
+	void add(const std::pair<std::string, std::string>& config);
 	
-	static std::map<std::string, std::string> configs_;
+	std::map<std::string, std::string> configs_;
 };
 
 #endif

@@ -2,8 +2,6 @@
 #include "Base.h"
 #include "PacketCreator.h"
 
-#include <atomic>
-
 using namespace std;
 
 static mutex g_main_sync;
@@ -14,6 +12,7 @@ static void printStart() {
 
 // TODO: Load up game from here
 static void load() {
+	Base::engine().load();
 	Base::engine().start();
 }
 
@@ -48,7 +47,10 @@ static void process() {
 		
 	Log(DEBUG) << "Entering packet loop\n";	
 
-	while (true) {
+	// Send spawn packet here for now
+	Base::network().send(PacketCreator::spawn());
+	
+	while (true) {	
 		auto& packet = Base::network().waitForPacket();
 		
 		g_main_sync.lock();

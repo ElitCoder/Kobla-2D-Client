@@ -19,3 +19,11 @@ Packet PacketCreator::ping() {
 	
 	return packet;
 }
+
+Packet PacketCreator::spawn() {
+	Packet packet;
+	packet.addHeader(HEADER_SPAWN);
+	packet.finalize();
+	
+	return packet;
+}

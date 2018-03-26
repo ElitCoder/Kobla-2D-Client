@@ -4,7 +4,7 @@ Game client for Kobla, rebase under development.
 
 ESSENTIALS:
 (Debian-based)
-sudo apt-get install libsfml-dev
+./install.sh
 
 BUILDING:
 ./create.sh

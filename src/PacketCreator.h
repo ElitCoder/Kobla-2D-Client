@@ -7,13 +7,15 @@ enum {
 	HEADER_LOGIN,
 	HEADER_GET_CHARACTERS,
 	HEADER_PING_ALIVE,
-	HEADER_UNKNOWN
+	HEADER_UNKNOWN,
+	HEADER_SPAWN
 };
 
 class PacketCreator {
 public:
 	static Packet login(const std::string& username, const std::string& password);
 	static Packet ping();
+	static Packet spawn();
 };
 
 #endif
