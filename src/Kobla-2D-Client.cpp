@@ -2,6 +2,8 @@
 #include "Base.h"
 #include "PacketCreator.h"
 
+#include <atomic>
+
 using namespace std;
 
 static mutex g_main_sync;
@@ -12,17 +14,21 @@ static void printStart() {
 
 // TODO: Load up game from here
 static void load() {
+	Base::engine().start();
 }
 
 static void render() {
-	while (true) {
+	Log(DEBUG) << "Starting render\n";
+	
+	while (Base::engine().running()) {
 		g_main_sync.lock();
 		
-		// Render here
 		Base::game().logic();
+		Base::engine().render();
 		
+		// ** Now using v-sync **
 		// Sleep since no graphics
-		this_thread::sleep_for(chrono::milliseconds(10));
+		//this_thread::sleep_for(chrono::milliseconds(10));
 		
 		g_main_sync.unlock();
 	}
@@ -38,8 +44,9 @@ static void process() {
 	Base::network().start(hostname, port);
 	
 	load();
-	
 	thread render_thread(render);
+		
+	Log(DEBUG) << "Entering packet loop\n";	
 
 	while (true) {
 		auto& packet = Base::network().waitForPacket();
