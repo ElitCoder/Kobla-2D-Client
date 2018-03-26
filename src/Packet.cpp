@@ -1,170 +1,216 @@
 #include "Packet.h"
-#include "Main.h"
-#include "Misc.h"
+#include "Log.h"
+
+#include <array>
+#include <cstring>
 
 using namespace std;
 
-extern SOCKET sock;
-
-extern std::vector<SendPacket> toserv;
-
-void Packet::addHeader(int header)
-{
-	this->packet[2] = (unsigned char)header;
+Packet::Packet() : m_sent(0), m_read(0), m_finalized(false) {
 }
 
-void Packet::addInt(int what)
-{
-	this->packet[this->pos] = (unsigned char)what;
-	this->pos++;
+Packet::Packet(const unsigned char *buffer, const unsigned int size) : m_sent(0), m_read(0), m_finalized(false) {
+    if(buffer == nullptr || size == 0) {
+        Log(WARNING) << "Trying to create packet with empty buffer\n";
+        
+        return;
+    }
+    
+    m_packet.insert(m_packet.end(), buffer, buffer + size);
 }
 
-void Packet::addString(char add[])
-{
-	int length = strlen(add);
-
-	this->packet[this->pos] = (unsigned char)length;
-	this->pos++;
-
-	for(unsigned int i = 0; i < strlen(add); i++)
-	{
-		this->packet[this->pos] = add[i];
-		this->pos++;
-	}
+Packet::Packet(PartialPacket &&partialPacket) : m_sent(0), m_read(0), m_finalized(true) {
+    m_packet = move(partialPacket.getData());
+    
+    if(m_packet.size() < 4) {
+        Log(ERROR) << "Trying to remove header from partialPacket when m_packet is < 4\n";
+        
+        return;
+    }
+    
+    m_packet.erase(m_packet.begin(), m_packet.begin() + 4);
 }
 
-void Packet::addLongString(char add[])
-{
-	int strleng = strlen(add);
-	char buf[20] = "";
-
-	_itoa_s(strleng, buf, 10);
-	this->addString(buf);
-
-	for(int i = 0; i < strleng; i++)
-	{
-		this->packet[this->pos] = add[i];
-		this->pos++;
-	}
+void Packet::addHeader(const unsigned char header) {
+    if(isFinalized()) {
+        Log(ERROR) << "Can't add anything to a finalized packet\n";
+        
+        return;
+    }
+    
+    m_packet.push_back(header);
 }
 
-void Packet::addLongInt(int add)
-{
-	char buf[20] = "";
-
-	_itoa_s(add, buf, 10);
-	this->addString(buf);
+void Packet::addString(const string &str) {
+    if(isFinalized()) {
+        Log(ERROR) << "Can't add anything to a finalized packet\n";
+        
+        return;
+    }
+    
+    if(str.length() == 0)
+        Log(WARNING) << "Trying to add an empty string to packet\n";
+    
+    addInt(str.length());
+    m_packet.insert(m_packet.end(), str.begin(), str.end());
 }
 
-std::string getString(char *packet, int pos, int strleng)
-{
-	char temp[1000] = "";
-	std::string out;
-
-	for(int i = 0; i < strleng; i++)
-		temp[i] = packet[(pos + i)];
-
-	out = temp;
-	return out;
+void Packet::addPointer(const unsigned char *ptr, const unsigned int size) {
+    if(isFinalized()) {
+        Log(ERROR) << "Can't add anything to a finalized packet\n";
+        
+        return;
+    }
+    
+    if(ptr == nullptr || size == 0) {
+        Log(ERROR) << "Trying to add a nullptr or size = 0 to packet\n";
+    }
+    
+    addInt(size);
+    m_packet.insert(m_packet.end(), ptr, ptr + size);
 }
 
-string IntToString(int intt)
-{
-	char itoado[20] = "";
-	_itoa_s(intt, itoado, 20, 10);
-
-	std::string retVal = itoado;
-	return retVal;
+void Packet::addInt(const int nbr) {
+    if(isFinalized()) {
+        Log(ERROR) << "Can't add anything to a finalized packet\n";
+        
+        return;
+    }
+    
+    m_packet.push_back((nbr >> 24) & 0xFF);
+    m_packet.push_back((nbr >> 16) & 0xFF);
+    m_packet.push_back((nbr >> 8) & 0xFF);
+    m_packet.push_back(nbr & 0xFF);
 }
 
-string FloatToString(float add)
-{
-	char itoado[20] = "";
-	sprintf_s(itoado, 20, "%2.1f", add);
-
-	std::string retVal = itoado;
-	return retVal;
+void Packet::addBool(const bool val) {
+    if(isFinalized()) {
+        Log(ERROR) << "Can't add anything to a finalized packet\n";
+        
+        return;
+    }
+    
+    m_packet.push_back(val ? 1 : 0);
 }
 
-void Packet::ready()
-{
-	this->packet[0] = 0x3;
-	this->packet[1] = 0;
-
-	unsigned char *datasend = new unsigned char[this->pos + 30];
-	memset(datasend, 0, this->pos + 30);
-
-	string lengd = IntToString(this->pos);
-
-	int setpos = 0;
-	datasend[0] = lengd.length();
-	setpos++;
-
-	for(unsigned int i = 0; i < lengd.length(); i++)
-	{
-		datasend[(i + 1)] = lengd.c_str()[i];
-		setpos++;
-	}
-
-	memcpy(datasend + setpos, this->packet, this->pos);
-
-	int fulllen = (this->pos + setpos);
-
-	SendPacket csp = SendPacket();
-
-	csp.bu = datasend;
-	csp.len = fulllen;
-	csp.cp = 0;
-
-	while(true)
-	{
-		SendPacket *sp = &csp;
-
-		if(sp->len == 0)
-		{
-			delete[] sp->bu;
-			break;
-		}
-
-		else if(sp->cp == sp->len)
-		{
-			delete[] sp->bu;
-			break;
-		}
-
-		else
-		{
-			int s = send(sock, (const char*)sp->bu + sp->cp, sp->len - sp->cp, 0);
-
-			if(s == 0)
-			{
-				break;
-			}
-
-			else if(s < 0)
-			{
-				break;
-			}
-
-			else if(s > 0)
-			{
-				sp->cp += s;
-
-				if(sp->cp >= sp->len)
-				{
-					delete[] sp->bu;
-					break;
-				}
-			}
-		}
-	}
+void Packet::addFloat(const float nbr) {
+    if(isFinalized()) {
+        Log(ERROR) << "Can't add anything to a finalized packet\n";
+        
+        return;
+    }
+    
+    string floatString = to_string(nbr);
+    
+    m_packet.push_back(floatString.length());
+    m_packet.insert(m_packet.end(), floatString.begin(), floatString.end());
 }
 
-bool getBool(int stat)
-{
-	if(stat == 1)
-		return true;
+float Packet::getFloat() {
+    unsigned char length = m_packet.at(m_read++);
+    
+    string str(m_packet.begin() + m_read, m_packet.begin() + length + m_read);
+    m_read += length;
+    
+    return stof(str);
+}
 
-	else
-		return false;
+string Packet::getString() {
+    unsigned int length = getInt();
+    
+    string str(m_packet.begin() + m_read, m_packet.begin() + m_read + length);
+    m_read += length;
+    
+    return str;
+}
+
+const unsigned char* Packet::getData() const {
+    if(!isFinalized()) {
+        Log(ERROR) << "Can't return data from packet not finalized\n";
+        
+        return nullptr;
+    }
+    
+    const unsigned char *data = m_packet.data();
+    
+    if(data == nullptr) {
+        Log(ERROR) << "Trying to return data from packet when nullptr\n";
+    }
+    
+    return data;
+}
+
+unsigned int Packet::getSize() const {
+    if(!isFinalized()) {
+        Log(ERROR) << "Can't return size of data from packet not finalized\n";
+        
+        return 0;
+    }
+    
+    return m_packet.size();
+}
+
+unsigned int Packet::getSent() const {
+    return m_sent;
+}
+
+unsigned char Packet::getByte() {
+    try {
+        return m_packet.at(m_read++);
+    } catch(const out_of_range &e) {
+        Log(ERROR) << "Trying to read beyond packet size, m_read = " << m_read << " packet size = " << m_packet.size() << endl;
+        
+        return 0;
+    }
+}
+
+int Packet::getInt() {
+    int nbr;
+    
+    try {
+        nbr = (m_packet.at(m_read) << 24) | (m_packet.at(m_read + 1) << 16) | (m_packet.at(m_read + 2) << 8) | m_packet.at(m_read + 3); 
+        m_read += 4;
+    } catch(...) {
+        Log(ERROR) << "Trying to read beyond packet size, m_read = " << m_read << " packet size = " << m_packet.size() << endl;
+        
+        return 0;
+    }
+    
+    return nbr;
+}
+
+void Packet::addSent(const int sent) {
+    m_sent += sent;
+}
+
+bool Packet::fullySent() const {
+    return m_sent >= m_packet.size();
+}
+
+bool Packet::isFinalized() const {
+    return m_finalized;
+}
+
+void Packet::finalize() {
+    if(isFinalized()) {
+        Log(ERROR) << "Packet is already finalized\n";
+        
+        return;
+    }
+    
+    unsigned int fullPacketSize = m_packet.size() + 4;
+    array<unsigned int, 4> packetSize;
+    
+    packetSize[0] = (fullPacketSize >> 24) & 0xFF;
+    packetSize[1] = (fullPacketSize >> 16) & 0xFF;
+    packetSize[2] = (fullPacketSize >> 8) & 0xFF;
+    packetSize[3] = fullPacketSize & 0xFF;
+    
+    m_packet.insert(m_packet.begin(), packetSize.begin(), packetSize.end());
+    
+    m_finalized = true;
+}
+
+bool Packet::isEmpty() const {
+    return isFinalized() ? m_packet.size() <= 4 : m_packet.empty();
 }
