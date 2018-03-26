@@ -22,6 +22,7 @@ public:
     
     void send(const Packet& packet);
     Packet* waitForPacketFast();
+    Packet& waitForPacket();
     void completePacket();
     
     PartialPacket& getPartialPacket();

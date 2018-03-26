@@ -4,12 +4,28 @@
 
 using namespace std;
 
+static mutex g_main_sync;
+
 static void printStart() {
 	Log(NONE) << "Kobla-2D-Client-Rebased [alpha] [" << __DATE__ << " @ " << __TIME__ << "]\n";
 }
 
 // TODO: Load up game from here
 static void load() {
+}
+
+static void render() {
+	while (true) {
+		g_main_sync.lock();
+		
+		// Render here
+		Base::game().logic();
+		
+		// Sleep since no graphics
+		this_thread::sleep_for(chrono::milliseconds(10));
+		
+		g_main_sync.unlock();
+	}
 }
 
 static void process() {
@@ -23,25 +39,19 @@ static void process() {
 	
 	load();
 	
+	thread render_thread(render);
+
 	while (true) {
-		while (true) {
-			auto* packet = Base::network().waitForPacketFast();
-			
-			if (packet == nullptr)
-				break;
-				
-			// Handle packet
-			Base::game().process(*packet);
-			
-			Base::network().completePacket();
-		}
+		auto& packet = Base::network().waitForPacket();
 		
-		// Logic and render
-		Base::game().logic();
+		g_main_sync.lock();
+		Base::game().process(packet);
+		g_main_sync.unlock();
 		
-		// Test packet
-		//Base::network().send(PacketCreator::ping());
+		Base::network().completePacket();
 	}
+	
+	render_thread.detach();
 }
 
 int main() {

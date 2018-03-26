@@ -39,12 +39,19 @@ static void connect(const string& hostname, unsigned short port, int& server_soc
 	memcpy(reinterpret_cast<char*>(&server.sin_addr), reinterpret_cast<char*>(hp->h_addr), hp->h_length);
 	server.sin_port = htons(port);
     
-    size_t connection_try = 1;
+    size_t connection_try = 0;
+    auto current_time = chrono::system_clock::now() + chrono::milliseconds(1500);
     
     while (connect(server_socket, reinterpret_cast<sockaddr*>(&server), sizeof(server)) < 0) {
-        Log(NETWORK) << "Could not connect #" << connection_try << endl;
+        if ((chrono::system_clock::now() - current_time).count() > 0) {
+            connection_try++;
+            Log(NETWORK) << "Could not connect, attempt #" << connection_try << endl;
+            
+            current_time += chrono::milliseconds(1500);
+        }
         
-        connection_try++;
+        // Avoid spamming the kernel with connect()
+        this_thread::sleep_for(chrono::milliseconds(100));
     }
     
     int on = 1;
@@ -138,6 +145,7 @@ NetworkCommunication::~NetworkCommunication() {
     
     incoming_packets_.clear();
     outgoing_packets_.clear();
+    partial_packets_.clear();
     
     receive_thread_.detach();
     send_thread_.detach();
@@ -148,6 +156,13 @@ void NetworkCommunication::start(const string& hostname, unsigned short port) {
         
     receive_thread_ = thread(receiveThread, ref(*this));
     send_thread_ = thread(sendThread, ref(*this));
+}
+
+Packet& NetworkCommunication::waitForPacket() {
+    unique_lock<mutex> lock(incoming_mutex_);
+    incoming_cv_.wait(lock, [this] { return !incoming_packets_.empty(); });
+    
+    return incoming_packets_.front();
 }
 
 Packet* NetworkCommunication::waitForPacketFast() {
