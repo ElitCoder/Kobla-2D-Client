@@ -113,26 +113,49 @@ sf::Font& Engine::getFont(const string& filename) {
 	return *looking_for;
 }
 
-string Engine::getMapName(int id) {
-	if (maps_.empty()) {
-		Config config;
-		config.parse("data/maps/id");
+static void loadDataID(vector<pair<int, string>>& container, const string& path) {
+	if (!container.empty())
+		return;
 		
-		for (auto& peer : config.internal()) {
-			Log(DEBUG) << peer.first << endl;
-			Log(DEBUG) << peer.second << endl;
-			
-			maps_.push_back({ stoi(peer.first), peer.second });
-		}
+	Config config;
+	config.parse(path);
+	
+	for (auto& peer : config.internal()) {
+		Log(DEBUG) << peer.first << endl;
+		Log(DEBUG) << peer.second << endl;
+		
+		container.push_back({ stoi(peer.first), peer.second });
 	}
+}
+
+static string findDataId(vector<pair<int, string>>& container, int id) {
+	auto iterator = find_if(container.begin(), container.end(), [id] (auto& peer) { return peer.first == id; });
 	
-	auto iterator = find_if(maps_.begin(), maps_.end(), [id] (auto& peer) { return peer.first == id; });
-	
-	if (iterator == maps_.end()) {
-		Log(WARNING) << "Can't find map from parsing config\n";
+	if (iterator == container.end()) {
+		Log(WARNING) << "Can't find ID from parsing config\n";
 		
 		return "";
 	}
 	
 	return (*iterator).second;
+}
+
+string Engine::getMapName(int id) {
+	loadDataID(map_names_, "data/maps/id");
+	
+	return findDataId(map_names_, id);
+}
+
+string Engine::getTextureName(int id) {
+	loadDataID(texture_names_, "data/textures/id");
+	
+	return findDataId(texture_names_, id);
+}
+
+string Engine::getTexturePath() {
+	return "data/textures/";
+}
+
+string Engine::getFontPath() {
+	return "data/fonts/";
 }

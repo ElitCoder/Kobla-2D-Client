@@ -11,6 +11,9 @@ public:
 	void set(const std::string& text);
 	void size(int pixels);
 	void color(const sf::Color& color);
+	void position(int x, int y);
+	
+	sf::FloatRect getSize();
 	
 private:
 	sf::Text text_;	

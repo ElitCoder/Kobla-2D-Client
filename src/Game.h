@@ -3,6 +3,7 @@
 
 #include "Packet.h"
 #include "Map.h"
+#include "Player.h"
 
 #include <deque>
 
@@ -18,12 +19,12 @@ public:
 	void processRenderQueue();
 	
 private:
-	
 	void handleSpawn();
 	
-	Packet* current_packet_;
-	Map current_map_;
+	Map map_;
+	Player player_;
 	
+	Packet* current_packet_;
 	std::deque<std::pair<unsigned char, Packet>> render_queue_;
 };
 

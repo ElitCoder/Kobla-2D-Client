@@ -6,8 +6,7 @@
 using namespace std;
 
 Game::Game() :
-	current_map_() {
-	Log(DEBUG) << "Running constructor\n";
+	map_() {
 }
 	
 void Game::process(Packet& packet) {
@@ -21,8 +20,6 @@ void Game::process(Packet& packet) {
 			
 		default: render_queue_.push_back({ header, packet });
 	}
-	
-	Log(DEBUG) << "Got packet " << header << endl;
 }
 
 void Game::processRender(unsigned char header) {
@@ -31,9 +28,7 @@ void Game::processRender(unsigned char header) {
 			break;
 			
 		default: Log(NETWORK) << "Unknown packet header " << header << endl;
-	}
-	
-	Log(DEBUG) << "[render] Got packet " << header << endl;
+	}	
 }
 
 void Game::processRenderQueue() {
@@ -55,11 +50,23 @@ void Game::logic() {
 
 void Game::render(sf::RenderWindow& window) {
 	// Render map first
-	current_map_.draw(window);
+	map_.draw(window);
+	player_.draw(window);
 }
 
 void Game::handleSpawn() {
-	int id = current_packet_->getInt();
+	int map_id = current_packet_->getInt();
+	int player_image_id = current_packet_->getInt();
 	
-	current_map_.load(Base::engine().getMapName(id));
+	int x = current_packet_->getInt();
+	int y = current_packet_->getInt();
+	string name = current_packet_->getString();
+	
+	// Load map
+	map_.load(Base::engine().getMapName(map_id));
+	
+	// Load player
+	player_.load(Base::engine().getTextureName(player_image_id));
+	player_.setName(name);
+	player_.setPosition(x, y);
 }

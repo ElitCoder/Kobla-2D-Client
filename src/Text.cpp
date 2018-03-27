@@ -4,7 +4,10 @@
 using namespace std;
 
 void Text::load(const string& filename) {
-	text_.setFont(Base::engine().getFont(filename));
+	string path = Base::engine().getFontPath();
+	path += filename;
+	
+	text_.setFont(Base::engine().getFont(path));
 }
 
 void Text::draw(sf::RenderWindow& window) {
@@ -21,4 +24,12 @@ void Text::size(int pixels) {
 
 void Text::color(const sf::Color& color) {
 	text_.setColor(color);
+}
+
+void Text::position(int x, int y) {
+	text_.setPosition(x, y);
+}
+
+sf::FloatRect Text::getSize() {
+	return text_.getGlobalBounds();
 }
