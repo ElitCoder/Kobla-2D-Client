@@ -13,6 +13,7 @@ public:
 	
 	void process(Packet& packet);
 	void logic();
+	void input(sf::Event& event, bool text, bool release);
 	
 	void render(sf::RenderWindow& window);
 	void processRender(unsigned char header);
@@ -26,6 +27,9 @@ private:
 	
 	Packet* current_packet_;
 	std::deque<std::pair<unsigned char, Packet>> render_queue_;
+	
+	// Put these in a config somewhere, or server-sided
+	double moving_speed_;
 };
 
 #endif

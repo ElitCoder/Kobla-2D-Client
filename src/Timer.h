@@ -6,7 +6,7 @@
 class Timer {
 public:
 	void start();
-	bool elapsed(const std::chrono::time_point<std::chrono::system_clock>& time);
+	long long elapsed();
 	
 private:
 	std::chrono::time_point<std::chrono::system_clock> start_time_;

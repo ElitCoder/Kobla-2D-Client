@@ -6,6 +6,8 @@ void Timer::start() {
 	start_time_ = chrono::system_clock::now();
 }
 
-bool Timer::elapsed(const chrono::time_point<std::chrono::system_clock>& time) {
-	return (time - start_time_).count() > 0;
+long long Timer::elapsed() {
+	auto milliseconds = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now() - start_time_);
+	
+	return milliseconds.count();
 }

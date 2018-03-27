@@ -6,7 +6,9 @@ using namespace std;
 
 extern mutex g_main_sync;
 
-Engine::Engine() {}
+Engine::Engine() {
+	game_status_ = GAME_STATUS_NONE;
+}
 
 Engine::~Engine() {}
 
@@ -18,43 +20,113 @@ void Engine::start() {
 	window_.setVerticalSyncEnabled(Base::settings().get<bool>("vsync"));
 }
 
+int Engine::getGameStatus() {
+	return game_status_;
+}
+
+void Engine::setGameStatus(int status) {
+	game_status_ = status;
+	
+	// Propagate this somehow?
+}
+
 bool Engine::running() {
 	return window_.isOpen();
+}
+
+// Between loading and black screen
+bool Engine::checkEventStatusNone(sf::Event& event) {
+	bool handled = true;
+	
+	switch (event.type) {
+		default: handled = false;
+	}
+	
+	return handled;
+}
+
+// Login screen (duh) (or writing text)
+bool Engine::checkEventStatusLoginScreen(sf::Event& event) {
+	bool handled = true;
+	
+	switch (event.type) {
+		case sf::Event::TextEntered: {
+			if (event.text.unicode < 128) {
+				Log(DEBUG) << "Entered " << static_cast<char>(event.text.unicode) << endl;
+				
+				Base::game().input(event, true, false);
+			}
+				
+			break;	
+		}
+		
+		default: handled = false;
+	}
+	
+	return handled;
+}
+
+// Ingame (key presses)
+bool Engine::checkEventStatusIngame(sf::Event& event) {
+	bool handled = true;
+	
+	switch (event.type) {
+		case sf::Event::KeyPressed: Base::game().input(event, false, false);
+			break;
+			
+		case sf::Event::KeyReleased: Base::game().input(event, false, true);
+			break;
+		
+		default: handled = false;
+	}
+	
+	return handled;
+}
+
+// Fall through to basic stuff like window handling
+void Engine::checkEventNotHandled(sf::Event& event) {
+	switch (event.type) {
+		case sf::Event::Closed: {
+			window_.close();
+			// Simple way to exit
+			exit(1);
+			break;
+		}
+		
+		case sf::Event::Resized: {
+			int w = Base::settings().get<int>("resolution_w");
+			int h = Base::settings().get<int>("resolution_h");
+			
+			window_.setSize(sf::Vector2u(w, h));
+			break;
+		}
+		
+		default:
+			;
+	}
 }
 
 void Engine::render() {
 	sf::Event event;
 	
 	while (window_.pollEvent(event)) {
-		switch (event.type) {
-			case sf::Event::Closed: {
-				window_.close();
-				
-				// Simple way to exit
-				exit(1);
-				
+		bool handled = false;
+		
+		switch (game_status_) {
+			case GAME_STATUS_NONE: handled = checkEventStatusNone(event);
 				break;
-			}
-			
-			case sf::Event::Resized: {
-				int w = Base::settings().get<int>("resolution_w");
-				int h = Base::settings().get<int>("resolution_h");
 				
-				window_.setSize(sf::Vector2u(w, h));
+			case GAME_STATUS_INGAME: handled = checkEventStatusIngame(event);
+				break;
 				
+			case GAME_STATUS_LOGINSCREEN: handled = checkEventStatusLoginScreen(event);
 				break;
-			}
-			
-			case sf::Event::TextEntered: {
-				if (event.text.unicode < 128)
-					Log(DEBUG) << "Entered " << static_cast<char>(event.text.unicode) << endl;
-					
-				break;	
-			}
-			
-			default:
-				break;
+				
+			default: Log(WARNING) << "Unknown game status " << game_status_ << endl;
 		}
+		
+		if (!handled)
+			checkEventNotHandled(event);
 	}
 	
 	window_.clear(sf::Color::Black);
