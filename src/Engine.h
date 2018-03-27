@@ -20,8 +20,6 @@ public:
 	bool running();
 	void render();
 	
-	void disableThreadRender();
-	
 	sf::Texture& getTexture(const std::string& filename);
 	sf::Font& getFont(const std::string& filename);
 	std::string getMapName(int id);

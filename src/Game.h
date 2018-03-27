@@ -14,6 +14,7 @@ public:
 	void logic();
 	
 	void render(sf::RenderWindow& window);
+	void processRender(unsigned char header);
 	void processRenderQueue();
 	
 private:

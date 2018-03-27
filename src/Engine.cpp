@@ -4,15 +4,11 @@
 
 using namespace std;
 
+extern mutex g_main_sync;
+
 Engine::Engine() {}
 
-Engine::~Engine() {
-	/*
-	for_each(entities_.begin(), entities_.end(), [] (auto* entity) {
-		delete entity;
-	});
-	*/
-}
+Engine::~Engine() {}
 
 void Engine::start() {
 	int w = Base::settings().get<int>("resolution_w");
@@ -20,8 +16,6 @@ void Engine::start() {
 	
 	window_.create(sf::VideoMode(w, h), "Kobla-2D-Client");
 	window_.setVerticalSyncEnabled(Base::settings().get<bool>("vsync"));
-	
-	window_.setActive(false);
 }
 
 bool Engine::running() {
@@ -29,9 +23,6 @@ bool Engine::running() {
 }
 
 void Engine::render() {
-	// Check rendering queue first
-	Base::game().processRenderQueue();
-	
 	sf::Event event;
 	
 	while (window_.pollEvent(event)) {
@@ -68,20 +59,20 @@ void Engine::render() {
 	
 	window_.clear(sf::Color::Black);
 	
-	/*
-	// Draw everything here
-	for_each(entities_.begin(), entities_.end(), [this] (auto* entity) {
-		entity->draw(window_);
-	});
-	*/
-	
+	// Draw everything
 	Base::game().render(window_);
 	
+	// Unlock main thread sync
+	g_main_sync.unlock();
+	
+	// This does not need to be protected
 	window_.display();
 }
 
 void Engine::load() {
 	Log(DEBUG) << "Loading up basic game\n";
+	
+	// TODO: Add things here if needed
 }
 
 sf::Texture& Engine::getTexture(const string& filename) {
@@ -120,10 +111,6 @@ sf::Font& Engine::getFont(const string& filename) {
 	}
 	
 	return *looking_for;
-}
-
-void Engine::disableThreadRender() {
-	window_.setActive(false);
 }
 
 string Engine::getMapName(int id) {

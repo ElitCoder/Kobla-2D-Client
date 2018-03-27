@@ -3,6 +3,6 @@ host: localhost
 port: 11000
 
 # Graphics
-vsync: 0
-resolution_w: 1024
-resolution_h: 768
+vsync: 1
+resolution_w: 800
+resolution_h: 600

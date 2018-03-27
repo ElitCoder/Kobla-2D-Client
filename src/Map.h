@@ -14,6 +14,7 @@ public:
 
 private:
 	tmx::MapLoader map_loader_;
+	bool loaded_;
 };
 
 #endif

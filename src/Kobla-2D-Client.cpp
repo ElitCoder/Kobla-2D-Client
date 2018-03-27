@@ -4,7 +4,7 @@
 
 using namespace std;
 
-static mutex g_main_sync;
+mutex g_main_sync;
 
 static void printStart() {
 	Log(NONE) << "Kobla-2D-Client-Rebased [alpha] [" << __DATE__ << " @ " << __TIME__ << "]\n";
@@ -12,24 +12,21 @@ static void printStart() {
 
 // TODO: Load up game from here
 static void load() {
-	Base::engine().load();
 	Base::engine().start();
+	Base::engine().load();
 }
 
-static void render() {
-	Log(DEBUG) << "Starting render\n";
+static void packetThread() {
+	Log(DEBUG) << "Starting packet thread\n";
 	
-	while (Base::engine().running()) {
+	while (true) {	
+		auto& packet = Base::network().waitForPacket();
+		
 		g_main_sync.lock();
-		
-		Base::game().logic();
-		Base::engine().render();
-		
-		// ** Now using v-sync **
-		// Sleep since no graphics
-		//this_thread::sleep_for(chrono::milliseconds(10));
-		
+		Base::game().process(packet);
 		g_main_sync.unlock();
+		
+		Base::network().completePacket();
 	}
 }
 
@@ -43,24 +40,26 @@ static void process() {
 	Base::network().start(hostname, port);
 	
 	load();
-	thread render_thread(render);
-		
-	Log(DEBUG) << "Entering packet loop\n";	
-
+	
+	thread packet_thread(packetThread);
+	
 	// Send spawn packet here for now
 	Base::network().send(PacketCreator::spawn());
 	
-	while (true) {	
-		auto& packet = Base::network().waitForPacket();
-		
+	Log(DEBUG) << "Starting rendering\n";
+	
+	while (Base::engine().running()) {
 		g_main_sync.lock();
-		Base::game().process(packet);
-		g_main_sync.unlock();
 		
-		Base::network().completePacket();
+		Base::game().logic();
+		Base::engine().render();
+		
+		// Unlock after drawing everything instead
+		//g_main_sync.unlock();
 	}
 	
-	render_thread.detach();
+	// If the game loop is ended, avoid SIGABRT on exit
+	packet_thread.detach();
 }
 
 int main() {
