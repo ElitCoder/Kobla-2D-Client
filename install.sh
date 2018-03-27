@@ -1,13 +1,16 @@
 #!/bin/bash
 
+# get number of cores
+cores=`grep --count ^processor /proc/cpuinfo`
+
 # install dependencies
-sudo apt-get install libsfml-dev
+sudo apt-get update && sudo apt-get install g++ libsfml-dev cmake zlib1g-dev
 
 # install sfml-tmxloader
 git clone https://github.com/fallahn/sfml-tmxloader.git
 cd sfml-tmxloader/
 mkdir build; cd build
-cmake .. && make -j 9
+cmake .. && make -j $cores
 sudo make install
 
 # move libs to PATH
