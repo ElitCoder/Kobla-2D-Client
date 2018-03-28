@@ -2,6 +2,7 @@
 #include "PacketCreator.h"
 #include "Engine.h"
 #include "Base.h"
+#include "Log.h"
 
 using namespace std;
 
@@ -44,8 +45,6 @@ void Character::setPosition(double x, double y) {
 		
 	x_ = x;
 	y_ = y;
-	
-	//Log(DEBUG) << "Position " << x << " " << y << endl;
 }
 
 // Start moving player in one direction
@@ -103,6 +102,22 @@ void Character::move() {
 			break;
 	}
 	
+	if (!isPlayerInsideMap(x, y)) {
+		switch (direction_) {
+			case PLAYER_MOVE_UP: y = 0;
+				break;
+				
+			case PLAYER_MOVE_DOWN: y = getMaxY();
+				break;
+				
+			case PLAYER_MOVE_LEFT: x = 0;
+				break;
+				
+			case PLAYER_MOVE_RIGHT: x = getMaxX();
+				break;
+		}
+	}
+		
 	setPosition(x, y);
 }
 
@@ -116,4 +131,51 @@ size_t Character::getID() const {
 
 void Character::setMovingSpeed(double speed) {
 	moving_speed_ = speed;
+}
+
+double Character::getX() const {
+	return x_;
+}
+
+double Character::getY() const {
+	return y_;
+}
+
+// Used for placing the character in middle of the screen during rendering
+double Character::getMiddleX() {
+	// Get size of player image and text
+	auto image_size = image_.getSize();
+
+	return x_ + image_size.width / 2;
+}
+
+double Character::getMiddleY() {
+	// Get size of player image and text
+	auto image_size = image_.getSize();
+
+	return y_ + image_size.height / 2;
+}
+
+// Are the new coordinates x and y inside of the map?
+bool Character::isPlayerInsideMap(double x, double y) {
+	// Don't move outside of the map
+	if (x < 0 || y < 0)
+		return false;
+		
+	if (x > getMaxX() || y > getMaxY())
+		return false;
+		
+	return true;
+}
+
+double Character::getMaxX() {
+	auto image_size = image_.getSize();
+	
+	return Base::game().getMapSize().x - image_size.width;
+}
+
+double Character::getMaxY() {
+	auto image_size = image_.getSize();
+	
+	return Base::game().getMapSize().y - image_size.height;
 }

@@ -29,6 +29,8 @@ public:
 	void pause();
 	void resume();
 	
+	sf::Vector2u getMapSize();
+	
 private:
 	void removeCharacter(int id);
 	void setGameStatus(int status);

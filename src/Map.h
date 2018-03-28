@@ -11,6 +11,8 @@ public:
 	
 	virtual void load(const std::string& filename) override;
 	virtual void draw(sf::RenderWindow& window) override;
+	
+	sf::Vector2u getSize();
 
 private:
 	tmx::MapLoader map_loader_;

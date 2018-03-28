@@ -95,10 +95,15 @@ void Engine::checkEventNotHandled(sf::Event& event) {
 		}
 		
 		case sf::Event::Resized: {
+			sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+        	window_.setView(sf::View(visibleArea));
+			
+			/*
 			int w = Base::settings().get<int>("resolution_w");
 			int h = Base::settings().get<int>("resolution_h");
 			
 			window_.setSize(sf::Vector2u(w, h));
+			*/
 			break;
 		}
 		

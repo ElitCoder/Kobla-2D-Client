@@ -29,9 +29,19 @@ public:
 	void stopMoving(bool tell_server);
 	
 	size_t getID() const;
+	double getX() const;
+	double getY() const;
+	
+	// Used for rendering
+	double getMiddleX();
+	double getMiddleY();
+	double getMaxX();
+	double getMaxY();
 	
 protected:
 	Character();
+	
+	bool isPlayerInsideMap(double x, double y);
 	
 	size_t id_;
 	std::string name_;

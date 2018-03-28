@@ -20,3 +20,7 @@ void Map::draw(sf::RenderWindow& window) {
 		
 	window.draw(map_loader_);
 }
+
+sf::Vector2u Map::getSize() {
+	return map_loader_.getMapSize();
+}

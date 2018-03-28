@@ -66,6 +66,28 @@ void Game::logic() {
 }
 
 void Game::render(sf::RenderWindow& window) {
+	// Change view to put player in middle
+	sf::View view;
+	auto x = player_.getMiddleX();
+	auto y = player_.getMiddleY();
+	
+	// Check if the player is in the corners
+	if (x < window.getSize().x / 2)
+		x = window.getSize().x / 2;
+		
+	if (y < window.getSize().y / 2)
+		y = window.getSize().y / 2;
+	
+	if (x > getMapSize().x - window.getSize().x / 2)
+		x = getMapSize().x - window.getSize().x / 2;
+		
+	if (y > getMapSize().y - window.getSize().y / 2)
+		y = getMapSize().y - window.getSize().y / 2;
+	
+	view.setCenter(x, y);
+	view.setSize(window.getSize().x, window.getSize().y);
+	window.setView(view);
+	
 	// Render map first
 	map_.draw(window);
 	
@@ -73,7 +95,7 @@ void Game::render(sf::RenderWindow& window) {
 	for (auto& player : players_)
 		player.draw(window);
 		
-	player_.draw(window);	
+	player_.draw(window);
 }
 
 // Return false if the event was not handled
@@ -145,6 +167,10 @@ void Game::processRenderQueue() {
 		
 		render_queue_.pop_front();
 	}
+}
+
+sf::Vector2u Game::getMapSize() {
+	return map_.getSize();
 }
 
 void Game::handleSpawn() {
