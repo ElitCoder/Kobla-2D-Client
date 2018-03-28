@@ -21,3 +21,11 @@ sf::FloatRect Image::getSize() {
 void Image::position(int x, int y) {
 	sprite_.setPosition(x, y);
 }
+
+void Image::scale(double value) {
+	sprite_.setScale(value, value);
+}
+
+sf::Sprite& Image::internal() {
+	return sprite_;
+}

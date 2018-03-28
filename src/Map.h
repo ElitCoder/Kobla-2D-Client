@@ -13,6 +13,8 @@ public:
 	virtual void draw(sf::RenderWindow& window) override;
 	
 	sf::Vector2u getSize();
+	
+	bool isCollision(const sf::FloatRect& bound);
 
 private:
 	tmx::MapLoader map_loader_;

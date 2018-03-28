@@ -29,7 +29,7 @@ public:
 	void pause();
 	void resume();
 	
-	sf::Vector2u getMapSize();
+	Map& getMap();
 	
 private:
 	void removeCharacter(int id);

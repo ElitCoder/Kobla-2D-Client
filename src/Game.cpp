@@ -72,20 +72,23 @@ void Game::render(sf::RenderWindow& window) {
 	auto y = player_.getMiddleY();
 	
 	// Check if the player is in the corners
-	if (x < window.getSize().x / 2)
-		x = window.getSize().x / 2;
-		
-	if (y < window.getSize().y / 2)
-		y = window.getSize().y / 2;
+	auto window_size = window.getSize();
+	auto map_size = getMap().getSize();
 	
-	if (x > getMapSize().x - window.getSize().x / 2)
-		x = getMapSize().x - window.getSize().x / 2;
+	if (x < window_size.x / 2)
+		x = window_size.x / 2;
 		
-	if (y > getMapSize().y - window.getSize().y / 2)
-		y = getMapSize().y - window.getSize().y / 2;
+	if (y < window_size.y / 2)
+		y = window_size.y / 2;
+	
+	if (x > map_size.x - window_size.x / 2)
+		x = map_size.x - window_size.x / 2;
+		
+	if (y > map_size.y - window_size.y / 2)
+		y = map_size.y - window_size.y / 2;
 	
 	view.setCenter(x, y);
-	view.setSize(window.getSize().x, window.getSize().y);
+	view.setSize(window_size.x, window_size.y);
 	window.setView(view);
 	
 	// Render map first
@@ -169,8 +172,8 @@ void Game::processRenderQueue() {
 	}
 }
 
-sf::Vector2u Game::getMapSize() {
-	return map_.getSize();
+Map& Game::getMap() {
+	return map_;
 }
 
 void Game::handleSpawn() {

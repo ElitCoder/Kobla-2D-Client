@@ -20,6 +20,9 @@ void Character::draw(sf::RenderWindow& window) {
 void Character::load(const string& filename) {
 	image_.load(filename);
 	text_.load(NORMAL_FONT);
+	
+	// TODO: Remove this later
+	image_.scale(0.65);
 }
 
 void Character::setName(const string& name) {
@@ -27,7 +30,7 @@ void Character::setName(const string& name) {
 	
 	// Update display text
 	text_.set(name);
-	text_.size(24);
+	text_.size(20);
 	text_.color(sf::Color::White);
 }
 
@@ -38,7 +41,7 @@ void Character::setPosition(double x, double y) {
 	
 	// Set text to centered of player image
 	int text_x = image_size.width / 2 - text_size.width / 2;
-	int text_y = -text_size.height;
+	int text_y = -text_size.height - 8;
 	
 	text_.position(x + text_x, y + text_y);
 	image_.position(x, y);
@@ -117,6 +120,25 @@ void Character::move() {
 				break;
 		}
 	}
+	
+	// Test new position with collisions
+	image_.position(x, y);
+	
+	// Only use boots for collision detection
+	auto rect = image_.internal().getGlobalBounds();
+	auto body = (double)rect.height * 0.7;
+	auto boots = (double)rect.width * 0.5;
+	
+	rect.top += body;
+	rect.height -= body;
+	rect.left += boots / 2;
+	rect.width -= boots;
+	
+	if (Base::game().getMap().isCollision(rect)) {
+		// Did not work, revert to old values
+		image_.position(x_, y_);
+		return;
+	}
 		
 	setPosition(x, y);
 }
@@ -171,11 +193,11 @@ bool Character::isPlayerInsideMap(double x, double y) {
 double Character::getMaxX() {
 	auto image_size = image_.getSize();
 	
-	return Base::game().getMapSize().x - image_size.width;
+	return Base::game().getMap().getSize().x - image_size.width;
 }
 
 double Character::getMaxY() {
 	auto image_size = image_.getSize();
 	
-	return Base::game().getMapSize().y - image_size.height;
+	return Base::game().getMap().getSize().y - image_size.height;
 }

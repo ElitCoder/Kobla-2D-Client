@@ -12,6 +12,15 @@ void Map::load(const string& filename) {
 		Log(WARNING) << "Map " << filename << " could not be loaded\n";
 	else
 		loaded_ = true;
+		
+	if (!loaded_)
+		return;
+		
+	const auto& layers = map_loader_.getLayers();
+	
+	for (const auto& layer : layers) {
+		Log(DEBUG) << "Layer name: " << layer.name << endl;
+	}
 }
 
 void Map::draw(sf::RenderWindow& window) {
@@ -23,4 +32,20 @@ void Map::draw(sf::RenderWindow& window) {
 
 sf::Vector2u Map::getSize() {
 	return map_loader_.getMapSize();
+}
+
+bool Map::isCollision(const sf::FloatRect& bound) {
+	const auto& layers = map_loader_.getLayers();
+	
+	for (const auto& layer : layers) {
+		if (layer.name != "Collision")
+			continue;
+			
+		for(const auto& object : layer.objects) {
+			if (object.getAABB().intersects(bound))
+				return true;
+        }
+	}
+	
+	return false;
 }
