@@ -6,9 +6,7 @@ using namespace std;
 
 extern mutex g_main_sync;
 
-Engine::Engine() {
-	game_status_ = GAME_STATUS_NONE;
-}
+Engine::Engine() {}
 
 Engine::~Engine() {}
 
@@ -20,6 +18,7 @@ void Engine::start() {
 	window_.setVerticalSyncEnabled(Base::settings().get<bool>("vsync"));
 }
 
+/*
 int Engine::getGameStatus() {
 	return game_status_;
 }
@@ -29,11 +28,13 @@ void Engine::setGameStatus(int status) {
 	
 	// Propagate this somehow?
 }
+*/
 
 bool Engine::running() {
 	return window_.isOpen();
 }
 
+/*
 // Between loading and black screen
 bool Engine::checkEventStatusNone(sf::Event& event) {
 	bool handled = true;
@@ -82,7 +83,7 @@ bool Engine::checkEventStatusIngame(sf::Event& event) {
 	
 	return handled;
 }
-
+*/
 // Fall through to basic stuff like window handling
 void Engine::checkEventNotHandled(sf::Event& event) {
 	switch (event.type) {
@@ -101,6 +102,12 @@ void Engine::checkEventNotHandled(sf::Event& event) {
 			break;
 		}
 		
+		case sf::Event::LostFocus: Base::game().pause();
+			break;
+			
+		case sf::Event::GainedFocus: Base::game().resume();
+			break;
+		
 		default:
 			;
 	}
@@ -110,22 +117,7 @@ void Engine::render() {
 	sf::Event event;
 	
 	while (window_.pollEvent(event)) {
-		bool handled = false;
-		
-		switch (game_status_) {
-			case GAME_STATUS_NONE: handled = checkEventStatusNone(event);
-				break;
-				
-			case GAME_STATUS_INGAME: handled = checkEventStatusIngame(event);
-				break;
-				
-			case GAME_STATUS_LOGINSCREEN: handled = checkEventStatusLoginScreen(event);
-				break;
-				
-			default: Log(WARNING) << "Unknown game status " << game_status_ << endl;
-		}
-		
-		if (!handled)
+		if (!Base::game().input(event))
 			checkEventNotHandled(event);
 	}
 	

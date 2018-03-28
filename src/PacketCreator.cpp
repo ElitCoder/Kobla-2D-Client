@@ -27,3 +27,15 @@ Packet PacketCreator::spawn() {
 	
 	return packet;
 }
+
+Packet PacketCreator::move(double x, double y, int direction, bool moving) {
+	Packet packet;
+	packet.addHeader(HEADER_MOVE);
+	packet.addBool(moving);
+	packet.addFloat(x);
+	packet.addFloat(y);
+	packet.addInt(direction);
+	packet.finalize();
+	
+	return packet;
+}

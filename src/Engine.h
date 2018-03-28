@@ -5,13 +5,6 @@
 
 #define NORMAL_FONT	("CAPUT_TRIAL.ttf")
 
-// How to handle key presses
-enum {
-	GAME_STATUS_INGAME,
-	GAME_STATUS_LOGINSCREEN,
-	GAME_STATUS_NONE
-};
-
 class Engine {
 public:
 	Engine();

@@ -115,6 +115,10 @@ float Packet::getFloat() {
     return stof(str);
 }
 
+bool Packet::getBool() {
+    return m_packet.at(m_read++) == 1 ? true : false;
+}
+
 string Packet::getString() {
     unsigned int length = getInt();
     
