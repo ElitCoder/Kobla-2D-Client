@@ -8,6 +8,7 @@ using namespace std;
 
 Character::Character() {
 	moving_ = false;
+	collision_ = false;
 }
 
 Character::~Character() {}
@@ -34,6 +35,10 @@ void Character::setName(const string& name) {
 	text_.color(sf::Color::White);
 }
 
+void Character::setCollision(bool collision) {
+	collision_ = collision;
+}
+
 void Character::setPosition(double x, double y) {
 	// Get size of player image and text
 	auto image_size = image_.getSize();
@@ -48,6 +53,8 @@ void Character::setPosition(double x, double y) {
 		
 	x_ = x;
 	y_ = y;
+	
+	//Log(DEBUG) << "Setting position to " << x_ << " " << y_ << endl;
 }
 
 // Start moving player in one direction
@@ -134,7 +141,7 @@ void Character::move() {
 	rect.left += boots / 2;
 	rect.width -= boots;
 	
-	if (Base::game().getMap().isCollision(rect)) {
+	if (Base::game().isCollision(rect, *this)) {
 		// Did not work, revert to old values
 		image_.position(x_, y_);
 		return;
@@ -200,4 +207,11 @@ double Character::getMaxY() {
 	auto image_size = image_.getSize();
 	
 	return Base::game().getMap().getSize().y - image_size.height;
+}
+
+bool Character::isCollision(Character& character) {
+	if (!collision_)
+		return false;
+		
+	return character.image_.internal().getGlobalBounds().intersects(image_.internal().getGlobalBounds());
 }

@@ -29,6 +29,7 @@ public:
 	void pause();
 	void resume();
 	
+	bool isCollision(const sf::FloatRect& bound, Character& moving_player);
 	Map& getMap();
 	
 private:

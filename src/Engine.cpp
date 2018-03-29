@@ -166,7 +166,6 @@ sf::Texture* Engine::getTexture(const string& filename) {
 
 sf::Font* Engine::getFont(const string& filename) {
 	auto iterator = find_if(fonts_.begin(), fonts_.end(), [&filename] (auto& peer) { return peer.first == filename; });
-	sf::Font* looking_for = nullptr;
 	
 	if (iterator == fonts_.end()) {
 		sf::Font* font = new sf::Font;

@@ -160,6 +160,27 @@ void Game::removeCharacter(int id) {
 		players_.erase(is_player);
 }
 
+bool Game::isCollision(const sf::FloatRect& bound, Character& moving_player) {
+	if (map_.isCollision(bound))
+		return true;
+	
+	// Check if our own player is colliding
+	if (moving_player.getID() != player_.getID())
+		if (player_.isCollision(moving_player))
+			return true;
+	
+	// Check other collision players
+	for (auto& player : players_) {
+		if (player.getID() == moving_player.getID())
+			continue;
+			
+		if (player.isCollision(moving_player))
+			return true;
+	}
+	
+	return false;
+}
+
 void Game::processRenderQueue() {
 	while (!render_queue_.empty()) {
 		auto header = render_queue_.front().first;
@@ -178,12 +199,13 @@ Map& Game::getMap() {
 
 void Game::handleSpawn() {
 	auto map_id = current_packet_->getInt();
+	auto id = current_packet_->getInt();
 	auto player_image_id = current_packet_->getInt();
-	
 	auto x = current_packet_->getFloat();
 	auto y = current_packet_->getFloat();
 	auto name = current_packet_->getString();
 	auto moving_speed = current_packet_->getFloat();
+	auto collision = current_packet_->getBool();
 	
 	// Load map
 	map_.load(Base::engine().getMapName(map_id));
@@ -193,6 +215,8 @@ void Game::handleSpawn() {
 	player_.setName(name);
 	player_.setPosition(x, y);
 	player_.setMovingSpeed(moving_speed);
+	player_.setCollision(collision);
+	player_.setID(id);
 	
 	// Tell Game we're ingame to enable event handler properly
 	setGameStatus(GAME_STATUS_INGAME);
@@ -230,6 +254,7 @@ void Game::handleAddPlayer() {
 	auto y = current_packet_->getFloat();
 	auto name = current_packet_->getString();
 	auto moving_speed = current_packet_->getFloat();
+	auto collision = current_packet_->getBool();
 	
 	Player player;
 	player.load(Base::engine().getTextureName(texture_id));
@@ -238,6 +263,7 @@ void Game::handleAddPlayer() {
 	player.setID(id);
 	player.setPosition(x, y);
 	player.setMovingSpeed(moving_speed);
+	player.setCollision(collision);
 	
 	if (moving)
 		player.startMoving(direction, false);
@@ -245,6 +271,9 @@ void Game::handleAddPlayer() {
 	 	player.stopMoving(false);
 	
 	players_.push_back(player);
+	
+	Log(DEBUG) << "Added player with ID " << id << endl;
+	Log(DEBUG) << "Collision " << collision << endl;
 }
 
 void Game::handleRemove() {

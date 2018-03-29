@@ -23,6 +23,7 @@ public:
 	void setPosition(double x, double y);
 	void setID(size_t id);
 	void setMovingSpeed(double speed);
+	void setCollision(bool collision);
 	
 	void startMoving(int direction, bool tell_server);
 	void move();
@@ -31,6 +32,8 @@ public:
 	size_t getID() const;
 	double getX() const;
 	double getY() const;
+	
+	bool isCollision(Character& moving_player);
 	
 	// Used for rendering
 	double getMiddleX();
@@ -56,6 +59,7 @@ protected:
 	bool moving_;
 	int direction_;
 	double moving_speed_;
+	bool collision_;
 };
 
 #endif
