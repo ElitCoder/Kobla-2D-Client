@@ -12,11 +12,20 @@ cd sfml-tmxloader/
 mkdir build; cd build
 cmake .. && make -j $cores
 sudo make install
+cd ../../
+
+# install tgui
+git clone https://github.com/texus/TGUI.git
+cd TGUI/
+cmake . && make -j $cores
+sudo make install
+cd ../
 
 # move libs to PATH
-sudo cp /usr/local/lib/libtmx-loader.so /usr/lib/x86_64-linux-gnu/libtmx-loader.so
-sudo cp /usr/local/lib/libpugi.so /usr/lib/x86_64-linux-gnu/libpugi.so
+sudo cp /usr/local/lib/libtmx-loader.so /usr/lib/
+sudo cp /usr/local/lib/libpugi.so /usr/lib/
+sudo cp /usr/local/lib/libtgui.so* /usr/lib/
 
 # cleanup
-cd ../../
 rm -rf sfml-tmxloader
+rm -rf TGUI

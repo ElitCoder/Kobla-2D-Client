@@ -3,6 +3,8 @@
 
 // SFML
 #include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
+
 #include <string>
 
 enum {
@@ -18,9 +20,6 @@ public:
 	
 protected:
 	Entity();
-	
-	size_t draw_id_;
-	int type_;
 };
 
 #endif

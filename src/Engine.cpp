@@ -12,6 +12,9 @@ Engine::~Engine() {
 	// Clean fonts and textures
 	for_each(textures_.begin(), textures_.end(), [] (auto& peer) { delete peer.second; });
 	for_each(fonts_.begin(), fonts_.end(), [] (auto& peer) { delete peer.second; });
+	
+	// Destroy GUI
+	Base::destroyGUI();
 }
 
 void Engine::start() {
@@ -20,6 +23,9 @@ void Engine::start() {
 	
 	window_.create(sf::VideoMode(w, h), "Kobla-2D-Client");
 	window_.setVerticalSyncEnabled(Base::settings().get<bool>("vsync"));
+	
+	// Create the GUI
+	Base::createGUI(window_);
 }
 
 /*
@@ -102,6 +108,8 @@ void Engine::checkEventNotHandled(sf::Event& event) {
 			sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
         	window_.setView(sf::View(visibleArea));
 			
+			Base::gui().update();
+			
 			/*
 			int w = Base::settings().get<int>("resolution_w");
 			int h = Base::settings().get<int>("resolution_h");
@@ -128,12 +136,15 @@ void Engine::render() {
 	while (window_.pollEvent(event)) {
 		if (!Base::game().input(event))
 			checkEventNotHandled(event);
+			
+		Base::gui().internal().handleEvent(event);	
 	}
 	
 	window_.clear(sf::Color::Black);
 	
 	// Draw everything
 	Base::game().render(window_);
+	Base::gui().draw(window_);
 	
 	// Unlock main thread sync
 	g_main_sync.unlock();
