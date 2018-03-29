@@ -7,7 +7,7 @@ void Text::load(const string& filename) {
 	string path = Base::engine().getFontPath();
 	path += filename;
 	
-	text_.setFont(Base::engine().getFont(path));
+	text_.setFont(*Base::engine().getFont(path));
 }
 
 void Text::draw(sf::RenderWindow& window) {

@@ -8,7 +8,11 @@ extern mutex g_main_sync;
 
 Engine::Engine() {}
 
-Engine::~Engine() {}
+Engine::~Engine() {
+	// Clean fonts and textures
+	for_each(textures_.begin(), textures_.end(), [] (auto& peer) { delete peer.second; });
+	for_each(fonts_.begin(), fonts_.end(), [] (auto& peer) { delete peer.second; });
+}
 
 void Engine::start() {
 	int w = Base::settings().get<int>("resolution_w");
@@ -144,42 +148,37 @@ void Engine::load() {
 	// TODO: Add things here if needed
 }
 
-sf::Texture& Engine::getTexture(const string& filename) {
+sf::Texture* Engine::getTexture(const string& filename) {
 	auto iterator = find_if(textures_.begin(), textures_.end(), [&filename] (auto& peer) { return peer.first == filename; });
-	sf::Texture* looking_for = nullptr;
 	
 	if (iterator == textures_.end()) {
-		sf::Texture texture;
+		sf::Texture* texture = new sf::Texture;
 		
-		if (!texture.loadFromFile(filename))
+		if (!texture->loadFromFile(filename))
 			Log(WARNING) << "Could not load texture " << filename << endl;
 			
 		textures_.push_back({ filename, texture });	
-		looking_for = &textures_.back().second;
+		return texture;
 	} else {
-		looking_for = &(*iterator).second;
+		return iterator->second;
 	}
-	
-	return *looking_for;
 }
 
-sf::Font& Engine::getFont(const string& filename) {
+sf::Font* Engine::getFont(const string& filename) {
 	auto iterator = find_if(fonts_.begin(), fonts_.end(), [&filename] (auto& peer) { return peer.first == filename; });
 	sf::Font* looking_for = nullptr;
 	
 	if (iterator == fonts_.end()) {
-		sf::Font font;
+		sf::Font* font = new sf::Font;
 		
-		if (!font.loadFromFile(filename))
+		if (!font->loadFromFile(filename))
 			Log(WARNING) << "Could not load font " << filename << endl;
 			
 		fonts_.push_back({ filename, font });	
-		looking_for = &fonts_.back().second;
+		return font;
 	} else {
-		looking_for = &(*iterator).second;
+		return iterator->second;
 	}
-	
-	return *looking_for;
 }
 
 static void loadDataID(vector<pair<int, string>>& container, const string& path) {

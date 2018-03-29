@@ -22,8 +22,8 @@ public:
 	bool running();
 	void render();
 	
-	sf::Texture& getTexture(const std::string& filename);
-	sf::Font& getFont(const std::string& filename);
+	sf::Texture* getTexture(const std::string& filename);
+	sf::Font* getFont(const std::string& filename);
 	
 	std::string getMapName(int id);
 	std::string getTextureName(int id);
@@ -43,8 +43,8 @@ private:
 	
 	sf::RenderWindow window_;
 	
-	std::vector<std::pair<std::string, sf::Texture>> textures_;
-	std::vector<std::pair<std::string, sf::Font>> fonts_;
+	std::vector<std::pair<std::string, sf::Texture*>> textures_;
+	std::vector<std::pair<std::string, sf::Font*>> fonts_;
 	
 	std::vector<std::pair<int, std::string>> map_names_;
 	std::vector<std::pair<int, std::string>> texture_names_;

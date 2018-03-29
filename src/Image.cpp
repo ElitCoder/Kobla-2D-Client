@@ -7,7 +7,7 @@ void Image::load(const string& filename) {
 	string path = Base::engine().getTexturePath();
 	path += filename;
 	
-	sprite_.setTexture(Base::engine().getTexture(path));
+	sprite_.setTexture(*Base::engine().getTexture(path));
 }
 
 void Image::draw(sf::RenderWindow& window) {
