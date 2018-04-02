@@ -31,9 +31,6 @@ public:
 	std::string getTexturePath();
 	std::string getFontPath();
 	
-	int getGameStatus();
-	void setGameStatus(int status);
-	
 private:
 	void checkEventNotHandled(sf::Event& type);
 	

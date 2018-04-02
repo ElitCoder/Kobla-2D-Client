@@ -197,26 +197,35 @@ Map& Game::getMap() {
 	return map_;
 }
 
+static void readSpawnPlayer(Player& player, Packet& packet) {
+	auto id = packet.getInt();
+	auto player_image_id = packet.getInt();
+	auto x = packet.getFloat();
+	auto y = packet.getFloat();
+	auto name = packet.getString();
+	auto moving_speed = packet.getFloat();
+	auto collision = packet.getBool();
+	auto full_health = packet.getFloat();
+	auto current_health = packet.getFloat();
+	
+	// Load player
+	player.load(Base::engine().getTextureName(player_image_id));
+	player.setName(name);
+	player.setPosition(x, y);
+	player.setMovingSpeed(moving_speed);
+	player.setCollision(collision);
+	player.setID(id);
+	player.setHealth(full_health, current_health);
+}
+
 void Game::handleSpawn() {
 	auto map_id = current_packet_->getInt();
-	auto id = current_packet_->getInt();
-	auto player_image_id = current_packet_->getInt();
-	auto x = current_packet_->getFloat();
-	auto y = current_packet_->getFloat();
-	auto name = current_packet_->getString();
-	auto moving_speed = current_packet_->getFloat();
-	auto collision = current_packet_->getBool();
 	
 	// Load map
 	map_.load(Base::engine().getMapName(map_id));
 	
 	// Load player
-	player_.load(Base::engine().getTextureName(player_image_id));
-	player_.setName(name);
-	player_.setPosition(x, y);
-	player_.setMovingSpeed(moving_speed);
-	player_.setCollision(collision);
-	player_.setID(id);
+	readSpawnPlayer(player_, *current_packet_);
 	
 	// Tell Game we're ingame to enable event handler properly
 	setGameStatus(GAME_STATUS_INGAME);
@@ -246,34 +255,20 @@ void Game::handleMove() {
 }
 
 void Game::handleAddPlayer() {
-	auto id = current_packet_->getInt();
 	auto moving = current_packet_->getBool();
 	auto direction = current_packet_->getInt();
-	auto texture_id = current_packet_->getInt();
-	auto x = current_packet_->getFloat();
-	auto y = current_packet_->getFloat();
-	auto name = current_packet_->getString();
-	auto moving_speed = current_packet_->getFloat();
-	auto collision = current_packet_->getBool();
 	
 	Player player;
-	player.load(Base::engine().getTextureName(texture_id));
-	
-	player.setName(name);
-	player.setID(id);
-	player.setPosition(x, y);
-	player.setMovingSpeed(moving_speed);
-	player.setCollision(collision);
+	readSpawnPlayer(player, *current_packet_);
 	
 	if (moving)
 		player.startMoving(direction, false);
 	else
 	 	player.stopMoving(false);
-	
+		
 	players_.push_back(player);
 	
-	Log(DEBUG) << "Added player with ID " << id << endl;
-	Log(DEBUG) << "Collision " << collision << endl;
+	Log(DEBUG) << "Added player with ID " << player.getID() << endl;
 }
 
 void Game::handleRemove() {

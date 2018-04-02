@@ -24,6 +24,7 @@ public:
 	void setID(size_t id);
 	void setMovingSpeed(double speed);
 	void setCollision(bool collision);
+	void setHealth(double full, double current);
 	
 	void startMoving(int direction, bool tell_server);
 	void move();
@@ -60,6 +61,9 @@ protected:
 	int direction_;
 	double moving_speed_;
 	bool collision_;
+	
+	double current_health_;
+	double full_health_;
 };
 
 #endif

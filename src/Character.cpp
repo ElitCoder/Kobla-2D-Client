@@ -215,3 +215,8 @@ bool Character::isCollision(Character& character) {
 		
 	return character.image_.internal().getGlobalBounds().intersects(image_.internal().getGlobalBounds());
 }
+
+void Character::setHealth(double full, double current) {
+	full_health_ = full;
+	current_health_ = current;
+}

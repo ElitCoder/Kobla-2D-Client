@@ -32,10 +32,11 @@ public:
 	bool isCollision(const sf::FloatRect& bound, Character& moving_player);
 	Map& getMap();
 	
+	int getGameStatus();
+	
 private:
 	void removeCharacter(int id);
 	void setGameStatus(int status);
-	int getGameStatus();
 	
 	void handleSpawn();
 	void handleMove();
