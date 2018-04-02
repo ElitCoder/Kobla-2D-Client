@@ -42,6 +42,9 @@ void Game::processRender(unsigned char header) {
 		case HEADER_ADD_PLAYER: handleAddPlayer();
 			break;
 			
+		case HEADER_UPDATE_HEALTH: handleUpdateHealth();
+			break;
+			
 		default: Log(NETWORK) << "Unknown packet header " << header << endl;
 	}	
 }
@@ -229,6 +232,9 @@ void Game::handleSpawn() {
 	
 	// Tell Game we're ingame to enable event handler properly
 	setGameStatus(GAME_STATUS_INGAME);
+	
+	// Set health bar to represent the player's health
+	Base::gui().updateHealthBar(player_.getFullHealth(), player_.getCurrentHealth());
 }
 
 void Game::handleMove() {
@@ -275,4 +281,30 @@ void Game::handleRemove() {
 	auto id = current_packet_->getInt();
 	
 	removeCharacter(id);
+}
+
+Character* Game::getCharacter(int id) {
+	if (player_.getID() == (unsigned int)id)
+		return &player_;
+		
+	auto iterator = find_if(players_.begin(), players_.end(), [&id] (auto& player) {
+		return player.getID() == (unsigned int)id;
+	});
+	
+	if (iterator == players_.end())
+		Log(WARNING) << "Character not found: " << id << endl;
+		
+	return &*iterator;
+}
+
+void Game::handleUpdateHealth() {
+	auto id = current_packet_->getInt();
+	auto full = current_packet_->getFloat();
+	auto current = current_packet_->getFloat();
+	
+	Character* character = getCharacter(id);
+	character->setHealth(full, current);
+	
+	if (character->getID() == player_.getID())
+		Base::gui().updateHealthBar(full, current);
 }

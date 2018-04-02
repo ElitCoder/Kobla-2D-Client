@@ -28,72 +28,10 @@ void Engine::start() {
 	Base::createGUI(window_);
 }
 
-/*
-int Engine::getGameStatus() {
-	return game_status_;
-}
-
-void Engine::setGameStatus(int status) {
-	game_status_ = status;
-	
-	// Propagate this somehow?
-}
-*/
-
 bool Engine::running() {
 	return window_.isOpen();
 }
 
-/*
-// Between loading and black screen
-bool Engine::checkEventStatusNone(sf::Event& event) {
-	bool handled = true;
-	
-	switch (event.type) {
-		default: handled = false;
-	}
-	
-	return handled;
-}
-
-// Login screen (duh) (or writing text)
-bool Engine::checkEventStatusLoginScreen(sf::Event& event) {
-	bool handled = true;
-	
-	switch (event.type) {
-		case sf::Event::TextEntered: {
-			if (event.text.unicode < 128) {
-				Log(DEBUG) << "Entered " << static_cast<char>(event.text.unicode) << endl;
-				
-				Base::game().input(event, true, false);
-			}
-				
-			break;	
-		}
-		
-		default: handled = false;
-	}
-	
-	return handled;
-}
-
-// Ingame (key presses)
-bool Engine::checkEventStatusIngame(sf::Event& event) {
-	bool handled = true;
-	
-	switch (event.type) {
-		case sf::Event::KeyPressed: Base::game().input(event, false, false);
-			break;
-			
-		case sf::Event::KeyReleased: Base::game().input(event, false, true);
-			break;
-		
-		default: handled = false;
-	}
-	
-	return handled;
-}
-*/
 // Fall through to basic stuff like window handling
 void Engine::checkEventNotHandled(sf::Event& event) {
 	switch (event.type) {
@@ -130,7 +68,7 @@ void Engine::render() {
 		if (!Base::game().input(event))
 			checkEventNotHandled(event);
 			
-		Base::gui().internal().handleEvent(event);	
+		Base::gui().internal().handleEvent(event);
 	}
 	
 	window_.clear(sf::Color::Black);

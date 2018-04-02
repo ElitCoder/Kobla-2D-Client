@@ -34,6 +34,9 @@ public:
 	double getX() const;
 	double getY() const;
 	
+	double getFullHealth() const;
+	double getCurrentHealth() const;
+	
 	bool isCollision(Character& moving_player);
 	
 	// Used for rendering

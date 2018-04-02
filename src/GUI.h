@@ -13,6 +13,8 @@ public:
 	
 	tgui::Gui& internal();
 	
+	void updateHealthBar(double full, double current);
+	
 private:
 	tgui::Gui gui_;
 };

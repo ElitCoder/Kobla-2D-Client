@@ -35,6 +35,8 @@ public:
 	int getGameStatus();
 	
 private:
+	Character* getCharacter(int id);
+	
 	void removeCharacter(int id);
 	void setGameStatus(int status);
 	
@@ -42,6 +44,7 @@ private:
 	void handleMove();
 	void handleAddPlayer();
 	void handleRemove();
+	void handleUpdateHealth();
 	
 	Map map_;
 	Player player_;

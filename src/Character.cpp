@@ -220,3 +220,11 @@ void Character::setHealth(double full, double current) {
 	full_health_ = full;
 	current_health_ = current;
 }
+
+double Character::getFullHealth() const {
+	return full_health_;
+}
+
+double Character::getCurrentHealth() const {
+	return current_health_;
+}

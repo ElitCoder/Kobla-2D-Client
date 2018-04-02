@@ -68,7 +68,7 @@ void GUI::load(const string& file) {
 		hp_bar_size[0], hp_bar_size[1], label->getSize().x, label->getSize().y);
 		
 	label->setPosition(label_placement.front(), label_placement.back());
-	gui_.add(label);
+	gui_.add(label, "hp_bar_text");
 	
 	gui_.setOpacity(0.6);
 	
@@ -83,13 +83,13 @@ void GUI::update(const sf::View& view) {
 	
 	// Load the GUI again
 	load("");
+}
+
+void GUI::updateHealthBar(double full, double current) {
+	auto hp_bar = gui_.get<tgui::ProgressBar>("hp_bar");
+	auto percent = (current / full) * 100.0;
 	
-	/*
-	// Lower bar
-	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x, 50 };
-	auto widget = gui_.get("bottom_bar");
-		
-	widget->setSize(chatbox_size[0] + 20, chatbox_size[1] + 10);
-	widget->setPosition(-10, gui_.getTarget()->getSize().y - chatbox_size[1]);
-	*/
+	Log(DEBUG) << "Percent: " << percent << endl;
+	
+	hp_bar->setValue(percent);
 }
