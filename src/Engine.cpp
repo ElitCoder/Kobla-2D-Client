@@ -108,14 +108,7 @@ void Engine::checkEventNotHandled(sf::Event& event) {
 			sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
         	window_.setView(sf::View(visibleArea));
 			
-			Base::gui().update();
-			
-			/*
-			int w = Base::settings().get<int>("resolution_w");
-			int h = Base::settings().get<int>("resolution_h");
-			
-			window_.setSize(sf::Vector2u(w, h));
-			*/
+			Base::gui().update(window_.getView());
 			break;
 		}
 		

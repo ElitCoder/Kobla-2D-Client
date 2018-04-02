@@ -9,7 +9,7 @@ public:
 	
 	virtual void draw(sf::RenderWindow& window) override;
 	virtual void load(const std::string& file) override;
-	void update();
+	void update(const sf::View& view);
 	
 	tgui::Gui& internal();
 	

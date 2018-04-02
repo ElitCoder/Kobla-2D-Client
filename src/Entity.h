@@ -7,10 +7,6 @@
 
 #include <string>
 
-enum {
-	ENTITY_TYPE_MAP
-};
-
 class Entity {
 public:
 	virtual ~Entity();
