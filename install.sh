@@ -19,6 +19,10 @@ git clone https://github.com/texus/TGUI.git
 cd TGUI/
 cmake . && make -j $cores
 sudo make install
+
+# temp fix for cmake copying error
+sudo cp lib/libtgui.so* /usr/local/lib/
+
 cd ../
 
 # move libs to PATH
