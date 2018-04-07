@@ -6,10 +6,11 @@
 #include "Timer.h"
 
 enum {
-	PLAYER_MOVE_UP,
+	PLAYER_MOVE_RIGHT,
 	PLAYER_MOVE_DOWN,
 	PLAYER_MOVE_LEFT,
-	PLAYER_MOVE_RIGHT
+	PLAYER_MOVE_UP,
+	PLAYER_MOVE_MAX
 };
 
 class Character : public Entity {
