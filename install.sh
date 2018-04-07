@@ -6,13 +6,11 @@ cores=`grep --count ^processor /proc/cpuinfo`
 # install dependencies
 sudo apt-get update && sudo apt-get install g++ libsfml-dev cmake zlib1g-dev
 
-# install sfml-tmxloader
-git clone https://github.com/fallahn/sfml-tmxloader.git
+# install sfml-tmxloader (own fork with map animations)
+git clone https://github.com/ElitCoder/sfml-tmxloader.git
 cd sfml-tmxloader/
-mkdir build; cd build
-cmake .. && make -j $cores
-sudo make install
-cd ../../
+./install.sh
+cd ../
 
 # install tgui
 git clone https://github.com/texus/TGUI.git
@@ -24,6 +22,7 @@ sudo make install
 sudo cp lib/libtgui.so* /usr/local/lib/
 
 cd ../
+echo "TGUI was installed, with a workaround"
 
 # move libs to PATH
 sudo cp /usr/local/lib/libtmx-loader.so /usr/lib/
