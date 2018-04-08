@@ -12,6 +12,9 @@ tgui::Gui& GUI::internal() {
 }
 
 void GUI::draw(sf::RenderWindow& window) {
+	// Remove warning from g++
+	if (window.isOpen()) {}
+		
 	gui_.draw();
 }
 
@@ -20,18 +23,21 @@ static array<long, 2> getMiddlePlacement(double outside_width, double outside_he
 	double x = outside_x + outside_width / 2 - inside_width / 2;
 	double y = outside_y + outside_height / 2 - inside_height / 2;
 	
-	return { lround(x), lround(y) };
+	return {{ lround(x), lround(y) }};
 }
 
-static array<long, 2> addTextToWidgetPlacement(double x, double y, double width, double height,
+static array<long, 2> addTextToWidgetPlacement(double x, double y, double width,
 	double text_width, double text_height) {
 	double p_x = x + width / 2 - text_width / 2;
 	double p_y = y - text_height - 4;
 	
-	return { lround(p_x), lround(p_y) };
+	return {{ lround(p_x), lround(p_y) }};
 }
 
 void GUI::load(const string& file) {
+	// Remove g++ warning
+	if (file.size() > 0) {}
+	
 	// Lower bar
 	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x, 50 };
 	auto chatbox = tgui::ChatBox::create();
@@ -45,7 +51,7 @@ void GUI::load(const string& file) {
 	auto top_right = tgui::ChatBox::create();
 	
 	top_right->setSize(top_right_size[0], top_right_size[1]);
-	top_right->setPosition(gui_.getTarget()->getSize().x - top_right_size[0], 0);
+	top_right->setPosition(/*gui_.getTarget()->getSize().x - top_right_size[0]*/ 0, 0);
 	gui_.add(top_right, "top_right");
 	
 	// Add HP bar
@@ -65,7 +71,7 @@ void GUI::load(const string& file) {
 	label->setTextSize(18);
 	
 	auto label_placement = addTextToWidgetPlacement(hp_bar->getPosition().x, hp_bar->getPosition().y,
-		hp_bar_size[0], hp_bar_size[1], label->getSize().x, label->getSize().y);
+		hp_bar_size[0], label->getSize().x, label->getSize().y);
 		
 	label->setPosition(label_placement.front(), label_placement.back());
 	gui_.add(label, "hp_bar_text");
