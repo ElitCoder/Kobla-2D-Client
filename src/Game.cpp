@@ -243,6 +243,7 @@ void Game::handleMove() {
 	auto y = current_packet_->getFloat();
 	auto direction = current_packet_->getInt();
 	auto id = current_packet_->getInt();
+	auto predetermined_distance = current_packet_->getFloat();
 	
 	// It's a player?
 	for (auto& player : players_) {
@@ -251,10 +252,12 @@ void Game::handleMove() {
 			
 		player.setPosition(x, y);	
 			
-		if (moving)
+		if (moving) {
 			player.startMoving(direction, false);
-		else
+			player.setPredeterminedDistance(predetermined_distance);
+		} else {
 			player.stopMoving(false);
+		}
 			
 		break;
 	}

@@ -26,6 +26,7 @@ public:
 	void setMovingSpeed(double speed);
 	void setCollision(bool collision);
 	void setHealth(double full, double current);
+	void setPredeterminedDistance(double distance);
 	
 	void startMoving(int direction, bool tell_server);
 	void move();
@@ -37,6 +38,7 @@ public:
 	
 	double getFullHealth() const;
 	double getCurrentHealth() const;
+	double getPredetermindedDistance() const;
 	
 	bool isCollision(Character& moving_player);
 	
@@ -57,6 +59,9 @@ protected:
 	double x_;
 	double y_;
 	
+	double original_x_;
+	double original_y_;
+	
 	Image image_;
 	Text text_;
 	
@@ -65,6 +70,8 @@ protected:
 	int direction_;
 	double moving_speed_;
 	bool collision_;
+	double predetermined_distance_	= -1;
+	double distance_moved_ 			= 0;
 	
 	double current_health_;
 	double full_health_;

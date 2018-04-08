@@ -72,6 +72,12 @@ void Character::startMoving(int direction, bool tell_server) {
 	moving_ = true;
 	direction_ = direction;
 	
+	original_x_ = x_;
+	original_y_ = y_;
+	
+	predetermined_distance_ = -1;
+	distance_moved_ = 0;
+	
 	started_moving_.start();
 }
 
@@ -110,6 +116,33 @@ void Character::move() {
 			
 		case PLAYER_MOVE_RIGHT: x += pixels;
 			break;
+	}
+	
+	// Add to distance moved
+	distance_moved_ += pixels;
+	
+	if (predetermined_distance_ > 0 && distance_moved_ >= predetermined_distance_) {
+		// We had a predetermined distance to move, just set it to that value
+		switch (direction_) {
+			case PLAYER_MOVE_UP: y = original_y_ - predetermined_distance_;
+				break;
+				
+			case PLAYER_MOVE_DOWN: y = original_y_ + predetermined_distance_;
+				break;
+				
+			case PLAYER_MOVE_LEFT: x = original_x_ - predetermined_distance_;
+				break;
+				
+			case PLAYER_MOVE_RIGHT: x = original_x_ + predetermined_distance_;
+				break;
+		}
+		
+		setPosition(x, y);
+		
+		// Stop moving since the Server defined walking length
+		stopMoving(false);
+		
+		return;
 	}
 	
 	// Just ignore updating position if it would be outside map
@@ -215,4 +248,12 @@ double Character::getFullHealth() const {
 
 double Character::getCurrentHealth() const {
 	return current_health_;
+}
+
+void Character::setPredeterminedDistance(double distance) {
+	predetermined_distance_ = distance;
+}
+
+double Character::getPredetermindedDistance() const {
+	return predetermined_distance_;
 }
