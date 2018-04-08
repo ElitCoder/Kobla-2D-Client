@@ -112,21 +112,9 @@ void Character::move() {
 			break;
 	}
 	
-	if (!isPlayerInsideMap(x, y)) {
-		switch (direction_) {
-			case PLAYER_MOVE_UP: y = 0;
-				break;
-				
-			case PLAYER_MOVE_DOWN: y = getMaxY();
-				break;
-				
-			case PLAYER_MOVE_LEFT: x = 0;
-				break;
-				
-			case PLAYER_MOVE_RIGHT: x = getMaxX();
-				break;
-		}
-	}
+	// Just ignore updating position if it would be outside map
+	if (!isPlayerInsideMap(x, y))
+		return;
 	
 	// Test new position with collisions
 	image_.position(x, y);
