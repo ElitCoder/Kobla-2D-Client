@@ -130,8 +130,8 @@ static void loadDataID(vector<pair<int, string>>& container, const string& path)
 	config.parse(path);
 	
 	for (auto& peer : config.internal()) {
-		Log(DEBUG) << peer.first << endl;
-		Log(DEBUG) << peer.second << endl;
+		//Log(DEBUG) << peer.first << endl;
+		//Log(DEBUG) << peer.second << endl;
 		
 		container.push_back({ stoi(peer.first), peer.second });
 	}

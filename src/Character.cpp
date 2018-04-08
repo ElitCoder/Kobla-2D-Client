@@ -23,7 +23,7 @@ void Character::load(const string& filename) {
 	text_.load(NORMAL_FONT);
 	
 	// TODO: Remove this later
-	image_.scale(0.65);
+	image_.scale(0.6);
 }
 
 void Character::setName(const string& name) {

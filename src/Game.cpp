@@ -277,7 +277,7 @@ void Game::handleAddPlayer() {
 		
 	players_.push_back(player);
 	
-	Log(DEBUG) << "Added player with ID " << player.getID() << endl;
+	//Log(DEBUG) << "Added player with ID " << player.getID() << endl;
 }
 
 void Game::handleRemove() {
