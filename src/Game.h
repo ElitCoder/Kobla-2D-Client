@@ -19,7 +19,7 @@ public:
 	Game();
 	
 	void process(Packet& packet);
-	void logic();
+	void logic(sf::Clock& frame_clock);
 	bool input(sf::Event& event);
 	
 	void render(sf::RenderWindow& window);

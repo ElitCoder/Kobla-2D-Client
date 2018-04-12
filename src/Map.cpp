@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Log.h"
+#include "Base.h"
 
 using namespace std;
 
@@ -7,7 +8,9 @@ Map::Map() : map_loader_("data/maps") {
 	loaded_ = false;
 }
 
-void Map::load(const string& filename) {
+void Map::load(int id) {
+	auto filename = Base::engine().getMapName(id);
+	
 	if (!map_loader_.load(filename))
 		Log(WARNING) << "Map " << filename << " could not be loaded\n";
 	else

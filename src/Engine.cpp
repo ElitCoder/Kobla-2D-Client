@@ -90,13 +90,14 @@ void Engine::load() {
 	// TODO: Add things here if needed
 }
 
-sf::Texture* Engine::getTexture(const string& filename) {
+sf::Texture* Engine::getTexture(int id) {
+	auto filename = getTextureName(id);
 	auto iterator = find_if(textures_.begin(), textures_.end(), [&filename] (auto& peer) { return peer.first == filename; });
 	
 	if (iterator == textures_.end()) {
 		sf::Texture* texture = new sf::Texture;
 		
-		if (!texture->loadFromFile(filename))
+		if (!texture->loadFromFile(getTexturePath() + filename))
 			Log(WARNING) << "Could not load texture " << filename << endl;
 			
 		textures_.push_back({ filename, texture });	
@@ -112,11 +113,29 @@ sf::Font* Engine::getFont(const string& filename) {
 	if (iterator == fonts_.end()) {
 		sf::Font* font = new sf::Font;
 		
-		if (!font->loadFromFile(filename))
+		if (!font->loadFromFile(getFontPath() + filename))
 			Log(WARNING) << "Could not load font " << filename << endl;
 			
 		fonts_.push_back({ filename, font });	
 		return font;
+	} else {
+		return iterator->second;
+	}
+}
+
+CharacterInformation& Engine::getCharacterInformation(int id) {
+	auto filename = getCharacterInformationName(id);
+	auto iterator = find_if(characters_.begin(), characters_.end(), [&filename] (auto& peer) { return peer.first == filename; });
+	
+	if (iterator == characters_.end()) {
+		Config config;
+		config.parse(getCharacterPath() + filename);
+		
+		CharacterInformation information;
+		information.setConfig(config);
+		
+		characters_.push_back({ filename, information });
+		return characters_.back().second;
 	} else {
 		return iterator->second;
 	}
@@ -129,19 +148,15 @@ static void loadDataID(vector<pair<int, string>>& container, const string& path)
 	Config config;
 	config.parse(path);
 	
-	for (auto& peer : config.internal()) {
-		//Log(DEBUG) << peer.first << endl;
-		//Log(DEBUG) << peer.second << endl;
-		
-		container.push_back({ stoi(peer.first), peer.second });
-	}
+	for (auto& peer : config.internal()) 
+		container.push_back({ stoi(peer.first), peer.second.back() });
 }
 
 static string findDataId(vector<pair<int, string>>& container, int id) {
 	auto iterator = find_if(container.begin(), container.end(), [id] (auto& peer) { return peer.first == id; });
 	
 	if (iterator == container.end()) {
-		Log(WARNING) << "Can't find ID from parsing config\n";
+		Log(WARNING) << "Can't find ID " << id << " from parsing config\n";
 		
 		return "";
 	}
@@ -161,10 +176,20 @@ string Engine::getTextureName(int id) {
 	return findDataId(texture_names_, id);
 }
 
+string Engine::getCharacterInformationName(int id) {
+	loadDataID(character_names_, "data/characters/id");
+	
+	return findDataId(character_names_, id);
+}
+
 string Engine::getTexturePath() {
 	return "data/textures/";
 }
 
 string Engine::getFontPath() {
 	return "data/fonts/";
+}
+
+string Engine::getCharacterPath() {
+	return "data/characters/";
 }

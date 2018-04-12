@@ -4,6 +4,7 @@
 #include "Image.h"
 #include "Text.h"
 #include "Timer.h"
+#include "Config.h"
 
 enum {
 	PLAYER_MOVE_RIGHT,
@@ -13,12 +14,29 @@ enum {
 	PLAYER_MOVE_MAX
 };
 
+class CharacterInformation {
+public:
+	void setConfig(const Config& config);
+	
+	const Animation& getAnimation(int direction);
+	double getScale() const;
+	
+private:
+	Config config_;
+	
+	std::vector<int> animation_lines_;
+	std::vector<Animation> animations_;
+	bool animated_	= false;
+	int texture_id_	= -1;
+	double scale_ = 1;
+};
+
 class Character : public Entity {
 public:
 	virtual ~Character();
 	
 	virtual void draw(sf::RenderWindow& window) override;
-	virtual void load(const std::string& filename) override;
+	virtual void load(int id) override;
 	
 	void setName(const std::string& name);
 	void setPosition(double x, double y);
@@ -29,7 +47,7 @@ public:
 	void setPredeterminedDistance(double distance);
 	
 	void startMoving(int direction, bool tell_server);
-	void move();
+	void move(sf::Time& frame_time);
 	void stopMoving(bool tell_server);
 	
 	size_t getID() const;

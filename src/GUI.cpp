@@ -34,9 +34,9 @@ static array<long, 2> addTextToWidgetPlacement(double x, double y, double width,
 	return {{ lround(p_x), lround(p_y) }};
 }
 
-void GUI::load(const string& file) {
+void GUI::load(int id) {
 	// Remove g++ warning
-	if (file.size() > 0) {}
+	if (id) {}
 	
 	// Lower bar
 	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x, 50 };
@@ -88,7 +88,7 @@ void GUI::update(const sf::View& view) {
 	gui_.removeAllWidgets();
 	
 	// Load the GUI again
-	load("");
+	load(0);
 }
 
 void GUI::updateHealthBar(double full, double current) {

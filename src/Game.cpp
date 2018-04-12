@@ -29,13 +29,6 @@ void Game::process(Packet& packet) {
 		case HEADER_REMOVE_CHARACTER: handleRemove();
 			break;
 			
-		default: render_queue_.push_back({ header, packet });
-	}
-}
-
-// Moving packets are more expensive, avoid at all costs
-void Game::processRender(unsigned char header) {
-	switch (header) {
 		case HEADER_SPAWN: handleSpawn();
 			break;
 			
@@ -45,6 +38,13 @@ void Game::processRender(unsigned char header) {
 		case HEADER_UPDATE_HEALTH: handleUpdateHealth();
 			break;
 			
+		default: render_queue_.push_back({ header, packet });
+	}
+}
+
+// Moving packets are more expensive, avoid at all costs
+void Game::processRender(unsigned char header) {
+	switch (header) {
 		default: Log(NETWORK) << "Unknown packet header " << header << endl;
 	}	
 }
@@ -57,15 +57,18 @@ int Game::getGameStatus() {
 	return game_status_;
 }
 
-void Game::logic() {
+void Game::logic(sf::Clock& frame_clock) {
 	// Go through rendering packets before doing logic
 	processRenderQueue();
 	
+	// Set frame time for animations
+	auto frame_time = frame_clock.restart();
+	
 	// See if we're moving
-	player_.move();
+	player_.move(frame_time);
 	
 	for (auto& player : players_)
-		player.move();
+		player.move(frame_time);
 }
 
 void Game::render(sf::RenderWindow& window) {
@@ -212,7 +215,7 @@ static void readSpawnPlayer(Player& player, Packet& packet) {
 	auto current_health = packet.getFloat();
 	
 	// Load player
-	player.load(Base::engine().getTextureName(player_image_id));
+	player.load(player_image_id);
 	player.setName(name);
 	player.setPosition(x, y);
 	player.setMovingSpeed(moving_speed);
@@ -225,7 +228,7 @@ void Game::handleSpawn() {
 	auto map_id = current_packet_->getInt();
 	
 	// Load map
-	map_.load(Base::engine().getMapName(map_id));
+	map_.load(map_id);
 	
 	// Load player
 	readSpawnPlayer(player_, *current_packet_);

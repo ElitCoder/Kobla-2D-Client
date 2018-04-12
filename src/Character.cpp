@@ -6,6 +6,69 @@
 
 using namespace std;
 
+/*
+	CharacterInformation
+*/
+
+void CharacterInformation::setConfig(const Config& config) {
+	config_ = config;
+	
+	animated_ = config_.get<bool>("animated");
+	texture_id_ = config_.get<int>("texture");
+	scale_ = config_.get<double>("scale");
+	
+	if (animated_) {
+		// Same order as enum PLAYER_MOVE_*
+		animation_lines_.push_back(config_.get<int>("animation_right"));
+		animation_lines_.push_back(config_.get<int>("animation_down"));
+		animation_lines_.push_back(config_.get<int>("animation_left"));
+		animation_lines_.push_back(config_.get<int>("animation_up"));
+	}
+}
+
+double CharacterInformation::getScale() const {
+	return scale_;
+}
+
+const Animation& CharacterInformation::getAnimation(int direction) {
+	if (animations_.empty()) {
+		auto* texture = Base::engine().getTexture(texture_id_);
+		
+		if (animated_) {
+			// Load animations
+			for (auto& line : animation_lines_) {
+				Animation direction;
+				direction.setSpriteSheet(*texture);
+				
+				// Get size of texture
+				int size = texture->getSize().y / animation_lines_.size();
+				
+				for (size_t i = 0; i < texture->getSize().x; i += size)
+					direction.addFrame(sf::IntRect(i, line * size, size, size));
+					
+				animations_.push_back(direction);
+			}
+		} else {
+			Animation picture;
+			picture.setSpriteSheet(*texture);
+			
+			auto size = texture->getSize();
+			picture.addFrame(sf::IntRect(0, 0, size.x, size.y));
+			
+			animations_.push_back(picture);
+		}
+	}
+	
+	if (direction < 0 || direction >= (int)animations_.size())
+		return animations_.front();
+	
+	return animations_.at(direction);
+}
+
+/*
+	Character
+*/
+
 Character::Character() {
 	moving_ = false;
 	collision_ = false;
@@ -18,12 +81,13 @@ void Character::draw(sf::RenderWindow& window) {
 	text_.draw(window);
 }
 
-void Character::load(const string& filename) {
-	image_.load(filename);
-	text_.load(NORMAL_FONT);
+void Character::load(int id) {
+	// filename is the character ID
+	image_.load(id);
+	text_.load(NORMAL_FONT_ID);
 	
 	// TODO: Remove this later
-	image_.scale(0.6);
+	image_.scale(Base::engine().getCharacterInformation(id).getScale());
 }
 
 void Character::setName(const string& name) {
@@ -94,9 +158,17 @@ void Character::stopMoving(bool tell_server) {
 	moving_ = false;
 }
 
-void Character::move() {
-	if (!moving_)
+void Character::move(sf::Time& frame_time) {
+	image_.setAnimation(direction_);
+	
+	if (!moving_) {
+		image_.internal().stop();
+		image_.internal().update(frame_time);
+		
 		return;
+	}
+	
+	image_.internal().update(frame_time);
 	
 	auto time_elapsed = started_moving_.restart();
 	double pixels = moving_speed_ * time_elapsed;

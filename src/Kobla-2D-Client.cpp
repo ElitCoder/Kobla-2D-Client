@@ -48,10 +48,13 @@ static void process() {
 	
 	Log(DEBUG) << "Starting rendering\n";
 	
+	// Rendering clock for animations
+	sf::Clock frame_clock;
+	
 	while (Base::engine().running()) {
 		g_main_sync.lock();
 		
-		Base::game().logic();
+		Base::game().logic(frame_clock);
 		Base::engine().render();
 		
 		// Unlock after drawing everything instead

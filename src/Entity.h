@@ -12,7 +12,7 @@ public:
 	virtual ~Entity();
 	
 	virtual void draw(sf::RenderWindow& window) = 0;
-	virtual void load(const std::string& file) = 0;
+	virtual void load(int id) = 0;
 	
 protected:
 	Entity();

@@ -29,7 +29,7 @@ GUI& Base::gui() {
 void Base::createGUI(sf::RenderWindow& window) {
 	gui_ = new GUI(window);
 	
-	gui_->load("");
+	gui_->load(0);
 }
 
 void Base::destroyGUI() {

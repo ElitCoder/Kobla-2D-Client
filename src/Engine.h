@@ -3,7 +3,10 @@
 
 #include "Entity.h"
 
-#define NORMAL_FONT	("CAPUT_TRIAL.ttf")
+#define NORMAL_FONT		("CAPUT_TRIAL.ttf")
+#define NORMAL_FONT_ID	(0)
+
+class CharacterInformation;
 
 class Engine {
 public:
@@ -22,31 +25,31 @@ public:
 	bool running();
 	void render();
 	
-	sf::Texture* getTexture(const std::string& filename);
+	sf::Texture* getTexture(int id);
 	sf::Font* getFont(const std::string& filename);
+	CharacterInformation& getCharacterInformation(int id);
 	
 	std::string getMapName(int id);
+	
+private:
 	std::string getTextureName(int id);
+	std::string getCharacterInformationName(int id);
 	
 	std::string getTexturePath();
 	std::string getFontPath();
+	std::string getCharacterPath();
 	
-private:
 	void checkEventNotHandled(sf::Event& type);
-	
-	bool checkEventStatusNone(sf::Event& event);
-	bool checkEventStatusLoginScreen(sf::Event& event);
-	bool checkEventStatusIngame(sf::Event& event);
 	
 	sf::RenderWindow window_;
 	
 	std::vector<std::pair<std::string, sf::Texture*>> textures_;
 	std::vector<std::pair<std::string, sf::Font*>> fonts_;
+	std::vector<std::pair<std::string, CharacterInformation>> characters_;
 	
 	std::vector<std::pair<int, std::string>> map_names_;
 	std::vector<std::pair<int, std::string>> texture_names_;
-	
-	int game_status_;
+	std::vector<std::pair<int, std::string>> character_names_;
 };
 
 #endif

@@ -3,11 +3,11 @@
 
 using namespace std;
 
-void Text::load(const string& filename) {
-	string path = Base::engine().getFontPath();
-	path += filename;
+void Text::load(int id) {
+	// Ignore warning of not using id
+	if (id) {}
 	
-	text_.setFont(*Base::engine().getFont(path));
+	text_.setFont(*Base::engine().getFont(NORMAL_FONT));
 }
 
 void Text::draw(sf::RenderWindow& window) {

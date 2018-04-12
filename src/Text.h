@@ -5,7 +5,7 @@
 
 class Text : public Entity {
 public:
-	virtual void load(const std::string& filename) override;
+	virtual void load(int id) override;
 	virtual void draw(sf::RenderWindow& window) override;
 	
 	void set(const std::string& text);

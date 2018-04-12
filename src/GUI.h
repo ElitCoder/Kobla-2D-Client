@@ -8,7 +8,7 @@ public:
 	GUI(sf::RenderWindow& window);
 	
 	virtual void draw(sf::RenderWindow& window) override;
-	virtual void load(const std::string& file) override;
+	virtual void load(int id) override;
 	void update(const sf::View& view);
 	
 	tgui::Gui& internal();
