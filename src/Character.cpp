@@ -13,16 +13,23 @@ using namespace std;
 void CharacterInformation::setConfig(const Config& config) {
 	config_ = config;
 	
-	animated_ = config_.get<bool>("animated");
-	texture_id_ = config_.get<int>("texture");
-	scale_ = config_.get<double>("scale");
-	
-	if (animated_) {
-		// Same order as enum PLAYER_MOVE_*
-		animation_lines_.push_back(config_.get<int>("animation_right"));
-		animation_lines_.push_back(config_.get<int>("animation_down"));
-		animation_lines_.push_back(config_.get<int>("animation_left"));
-		animation_lines_.push_back(config_.get<int>("animation_up"));
+	try {
+		animated_ = config_.get<bool>("animated");
+		texture_id_ = config_.get<int>("texture");
+		scale_ = config_.get<double>("scale");
+		
+		collision_scale_x = config_.get<double>("collision_scale_x");
+		collision_scale_y = config_.get<double>("collision_scale_y");
+		
+		if (animated_) {
+			// Same order as enum PLAYER_MOVE_*
+			animation_lines_.push_back(config_.get<int>("animation_right"));
+			animation_lines_.push_back(config_.get<int>("animation_down"));
+			animation_lines_.push_back(config_.get<int>("animation_left"));
+			animation_lines_.push_back(config_.get<int>("animation_up"));
+		}	
+	} catch (NoConfigException& exception) {
+		// Config doesn't need to hold these values
 	}
 }
 
@@ -86,8 +93,13 @@ void Character::load(int id) {
 	image_.load(id);
 	text_.load(NORMAL_FONT_ID);
 	
-	// TODO: Remove this later
 	image_.scale(Base::engine().getCharacterInformation(id).getScale());
+	
+	// Set animation speed based on movement speed (this fits the animated player for now)
+	double frame_time = (1 / moving_speed_) * 10;
+	image_.internal().setFrameTime(sf::seconds(frame_time));
+	
+	character_id_ = id;
 }
 
 void Character::setName(const string& name) {
@@ -223,6 +235,9 @@ void Character::move(sf::Time& frame_time) {
 	
 	// Test new position with collisions
 	image_.position(x, y);
+	
+	// TODO: Check collision scaling
+	auto& information = Base::engine().getCharacterInformation(character_id_);
 	
 	// Only use boots for collision detection
 	auto rect = image_.internal().getGlobalBounds();

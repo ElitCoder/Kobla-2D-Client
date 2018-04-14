@@ -7,6 +7,9 @@ using namespace std;
 void Image::load(int id) {
 	sprite_ = AnimatedSprite(sf::seconds(0.2), true, true);
 	texture_id_ = id;
+	
+	// Set animation to standard so the text will be aligned
+	setAnimation(PLAYER_MOVE_RIGHT);
 }
 
 void Image::draw(sf::RenderWindow& window) {
@@ -20,7 +23,7 @@ sf::FloatRect Image::getSize() {
 	if (!loaded_)
 		return sf::FloatRect();
 		
-	return sprite_.getGlobalBounds();	
+	return sprite_.getGlobalBounds();
 }
 
 void Image::position(int x, int y) {

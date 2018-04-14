@@ -26,9 +26,11 @@ private:
 	
 	std::vector<int> animation_lines_;
 	std::vector<Animation> animations_;
-	bool animated_	= false;
-	int texture_id_	= -1;
-	double scale_ = 1;
+	bool animated_				= false;
+	int texture_id_				= -1;
+	double scale_				= 1;
+	double collision_scale_x	= 1;
+	double collision_scale_y	= 1;
 };
 
 class Character : public Entity {
@@ -93,6 +95,8 @@ protected:
 	
 	double current_health_;
 	double full_health_;
+	
+	int character_id_ = -1;
 };
 
 #endif
