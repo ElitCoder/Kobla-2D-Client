@@ -172,7 +172,7 @@ bool Game::isCollision(const sf::FloatRect& bound, Character& moving_player) {
 	
 	// Check if our own player is colliding
 	if (moving_player.getID() != player_.getID())
-		if (player_.isCollision(moving_player))
+		if (player_.isCollision(bound))
 			return true;
 	
 	// Check other collision players
@@ -180,7 +180,7 @@ bool Game::isCollision(const sf::FloatRect& bound, Character& moving_player) {
 		if (player.getID() == moving_player.getID())
 			continue;
 			
-		if (player.isCollision(moving_player))
+		if (player.isCollision(bound))
 			return true;
 	}
 	

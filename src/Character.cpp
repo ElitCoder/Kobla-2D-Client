@@ -72,6 +72,10 @@ const Animation& CharacterInformation::getAnimation(int direction) {
 	return animations_.at(direction);
 }
 
+array<double, 2> CharacterInformation::getCollisionScale() const {
+	return {{ collision_scale_x, collision_scale_y }};
+}
+
 /*
 	Character
 */
@@ -229,27 +233,12 @@ void Character::move(sf::Time& frame_time) {
 		return;
 	}
 	
-	// Just ignore updating position if it would be outside map
-	if (!isPlayerInsideMap(x, y))
-		return;
-	
 	// Test new position with collisions
 	image_.position(x, y);
+	auto box = getCollisionBox(true);
 	
-	// TODO: Check collision scaling
-	auto& information = Base::engine().getCharacterInformation(character_id_);
-	
-	// Only use boots for collision detection
-	auto rect = image_.internal().getGlobalBounds();
-	auto body = (double)rect.height * 0.7;
-	auto boots = (double)rect.width * 0.5;
-	
-	rect.top += body;
-	rect.height -= body;
-	rect.left += boots / 2;
-	rect.width -= boots;
-	
-	if (Base::game().isCollision(rect, *this)) {
+	// Just ignore updating position if it would be outside map
+	if (!isPlayerInsideMap(box) || Base::game().isCollision(box, *this)) {
 		// Did not work, revert to old values
 		image_.position(x_, y_);
 		return;
@@ -294,34 +283,50 @@ double Character::getMiddleY() {
 }
 
 // Are the new coordinates x and y inside of the map?
-bool Character::isPlayerInsideMap(double x, double y) {
+bool Character::isPlayerInsideMap(const sf::FloatRect& box) {
 	// Don't move outside of the map
-	if (x < 0 || y < 0)
+	if (box.left < 0 || box.top < 0)
 		return false;
 		
-	if (x > getMaxX() || y > getMaxY())
+	if ((box.left + box.width) > Base::game().getMap().getSize().x || (box.top + box.height) > Base::game().getMap().getSize().y)
 		return false;
 		
 	return true;
 }
 
-double Character::getMaxX() {
-	auto image_size = image_.getSize();
+sf::FloatRect Character::getCollisionBox(bool only_boots) {
+	// Calculate the actual collision detection box, since using the image full size can be too hard on the map
+	auto box = image_.internal().getGlobalBounds();
+	auto collision_scale = Base::engine().getCharacterInformation(character_id_).getCollisionScale();
+	auto size_x = box.width * collision_scale.front() * (only_boots ? 0.5 : 1.0);
+	auto size_y = box.height * collision_scale.back();
 	
-	return Base::game().getMap().getSize().x - image_size.width;
+	box.top += box.height / 2 - size_y / 2;
+	box.left += box.width / 2 - size_x / 2;
+	box.width = size_x;
+	box.height = size_y;
+	
+	// Only collision check with the boots
+	if (only_boots) {
+		auto body = box.height * 0.7;
+		auto boots = box.width * 0.8;
+		
+		box.top += body;
+		box.height -= body;
+		box.left += box.width / 2 - boots / 2;
+		box.width = boots;
+	}
+	
+	return box;
 }
 
-double Character::getMaxY() {
-	auto image_size = image_.getSize();
-	
-	return Base::game().getMap().getSize().y - image_size.height;
-}
-
-bool Character::isCollision(Character& character) {
+bool Character::isCollision(const sf::FloatRect& box) {
 	if (!collision_)
 		return false;
 		
-	return character.image_.internal().getGlobalBounds().intersects(image_.internal().getGlobalBounds());
+	return box.intersects(getCollisionBox(true));
+		
+	//return character.image_.internal().getGlobalBounds().intersects(image_.internal().getGlobalBounds());
 }
 
 void Character::setHealth(double full, double current) {

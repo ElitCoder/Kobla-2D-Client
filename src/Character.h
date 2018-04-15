@@ -21,6 +21,8 @@ public:
 	const Animation& getAnimation(int direction);
 	double getScale() const;
 	
+	std::array<double, 2> getCollisionScale() const;
+	
 private:
 	Config config_;
 	
@@ -60,18 +62,17 @@ public:
 	double getCurrentHealth() const;
 	double getPredetermindedDistance() const;
 	
-	bool isCollision(Character& moving_player);
+	bool isCollision(const sf::FloatRect& box);
 	
 	// Used for rendering
 	double getMiddleX();
 	double getMiddleY();
-	double getMaxX();
-	double getMaxY();
 	
 protected:
 	Character();
 	
-	bool isPlayerInsideMap(double x, double y);
+	bool isPlayerInsideMap(const sf::FloatRect& box);
+	sf::FloatRect getCollisionBox(bool only_boots);
 	
 	size_t id_;
 	std::string name_;
