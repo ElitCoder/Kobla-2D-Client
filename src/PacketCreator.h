@@ -12,7 +12,8 @@ enum {
 	HEADER_MOVE,
 	HEADER_ADD_PLAYER,
 	HEADER_REMOVE_CHARACTER,
-	HEADER_UPDATE_HEALTH
+	HEADER_UPDATE_HEALTH,
+	HEADER_SHOOT
 };
 
 class PacketCreator {
@@ -21,6 +22,7 @@ public:
 	static Packet ping();
 	static Packet spawn();
 	static Packet move(double x, double y, int direction, bool moving);
+	static Packet shoot();
 };
 
 #endif

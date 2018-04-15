@@ -39,3 +39,11 @@ Packet PacketCreator::move(double x, double y, int direction, bool moving) {
 	
 	return packet;
 }
+
+Packet PacketCreator::shoot() {
+	Packet packet;
+	packet.addHeader(HEADER_SHOOT);
+	packet.finalize();
+	
+	return packet;
+}
