@@ -123,19 +123,19 @@ sf::Font* Engine::getFont(const string& filename) {
 	}
 }
 
-CharacterInformation& Engine::getCharacterInformation(int id) {
-	auto filename = getCharacterInformationName(id);
-	auto iterator = find_if(characters_.begin(), characters_.end(), [&filename] (auto& peer) { return peer.first == filename; });
+ObjectInformation& Engine::getObjectInformation(int id) {
+	auto filename = getObjectInformationName(id);
+	auto iterator = find_if(objects_.begin(), objects_.end(), [&filename] (auto& peer) { return peer.first == filename; });
 	
-	if (iterator == characters_.end()) {
+	if (iterator == objects_.end()) {
 		Config config;
 		config.parse(getCharacterPath() + filename);
 		
-		CharacterInformation information;
+		ObjectInformation information;
 		information.setConfig(config);
 		
-		characters_.push_back({ filename, information });
-		return characters_.back().second;
+		objects_.push_back({ filename, information });
+		return objects_.back().second;
 	} else {
 		return iterator->second;
 	}
@@ -176,10 +176,10 @@ string Engine::getTextureName(int id) {
 	return findDataId(texture_names_, id);
 }
 
-string Engine::getCharacterInformationName(int id) {
-	loadDataID(character_names_, "data/characters/id");
+string Engine::getObjectInformationName(int id) {
+	loadDataID(object_names_, "data/objects/id");
 	
-	return findDataId(character_names_, id);
+	return findDataId(object_names_, id);
 }
 
 string Engine::getTexturePath() {
@@ -191,5 +191,5 @@ string Engine::getFontPath() {
 }
 
 string Engine::getCharacterPath() {
-	return "data/characters/";
+	return "data/objects/";
 }

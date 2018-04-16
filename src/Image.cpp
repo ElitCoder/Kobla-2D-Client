@@ -42,7 +42,7 @@ void Image::setAnimation(int direction) {
 	if (texture_id_ < 0)
 		return;
 	
-	sprite_.play(Base::engine().getCharacterInformation(texture_id_).getAnimation(direction));
+	sprite_.play(Base::engine().getObjectInformation(texture_id_).getAnimation(direction));
 	
 	if (!loaded_)
 		loaded_ = true;

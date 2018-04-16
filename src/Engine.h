@@ -6,7 +6,7 @@
 #define NORMAL_FONT		("CAPUT_TRIAL.ttf")
 #define NORMAL_FONT_ID	(0)
 
-class CharacterInformation;
+class ObjectInformation;
 
 class Engine {
 public:
@@ -27,13 +27,13 @@ public:
 	
 	sf::Texture* getTexture(int id);
 	sf::Font* getFont(const std::string& filename);
-	CharacterInformation& getCharacterInformation(int id);
+	ObjectInformation& getObjectInformation(int id);
 	
 	std::string getMapName(int id);
 	
 private:
 	std::string getTextureName(int id);
-	std::string getCharacterInformationName(int id);
+	std::string getObjectInformationName(int id);
 	
 	std::string getTexturePath();
 	std::string getFontPath();
@@ -45,11 +45,11 @@ private:
 	
 	std::vector<std::pair<std::string, sf::Texture*>> textures_;
 	std::vector<std::pair<std::string, sf::Font*>> fonts_;
-	std::vector<std::pair<std::string, CharacterInformation>> characters_;
+	std::vector<std::pair<std::string, ObjectInformation>> objects_;
 	
 	std::vector<std::pair<int, std::string>> map_names_;
 	std::vector<std::pair<int, std::string>> texture_names_;
-	std::vector<std::pair<int, std::string>> character_names_;
+	std::vector<std::pair<int, std::string>> object_names_;
 };
 
 #endif

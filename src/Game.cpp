@@ -65,10 +65,12 @@ void Game::logic(sf::Clock& frame_clock) {
 	auto frame_time = frame_clock.restart();
 	
 	// See if we're moving
-	player_.move(frame_time);
+	if (player_.move(frame_time))
+		player_.updatePosition();
 	
 	for (auto& player : players_)
-		player.move(frame_time);
+		if (player.move(frame_time))
+			player_.updatePosition();
 }
 
 void Game::render(sf::RenderWindow& window) {
@@ -172,7 +174,7 @@ void Game::removeCharacter(int id) {
 		players_.erase(is_player);
 }
 
-bool Game::isCollision(const sf::FloatRect& bound, Character& moving_player) {
+bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
 	if (map_.isCollision(bound))
 		return true;
 	
@@ -209,7 +211,7 @@ Map& Game::getMap() {
 	return map_;
 }
 
-static void readSpawnPlayer(Player& player, Packet& packet) {
+static void readSpawnPlayer(Character& player, Packet& packet) {
 	auto id = packet.getInt();
 	auto player_image_id = packet.getInt();
 	auto x = packet.getFloat();
@@ -276,7 +278,7 @@ void Game::handleAddPlayer() {
 	auto moving = current_packet_->getBool();
 	auto direction = current_packet_->getInt();
 	
-	Player player;
+	Character player;
 	readSpawnPlayer(player, *current_packet_);
 	
 	if (moving)

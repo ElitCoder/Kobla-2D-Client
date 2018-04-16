@@ -7,6 +7,9 @@
 
 #include <string>
 
+/*
+	Entity is a class for general drawing and loading, everything is based on entities, e.g Characters, GUI and Objects
+*/
 class Entity {
 public:
 	virtual ~Entity();

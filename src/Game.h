@@ -3,7 +3,7 @@
 
 #include "Packet.h"
 #include "Map.h"
-#include "Player.h"
+#include "Character.h"
 
 #include <deque>
 
@@ -29,7 +29,7 @@ public:
 	void pause();
 	void resume();
 	
-	bool isCollision(const sf::FloatRect& bound, Character& moving_player);
+	bool isCollision(const sf::FloatRect& bound, Object& object);
 	Map& getMap();
 	
 	int getGameStatus();
@@ -47,9 +47,9 @@ private:
 	void handleUpdateHealth();
 	
 	Map map_;
-	Player player_;
+	Character player_;
 	
-	std::vector<Player> players_;
+	std::vector<Character> players_;
 	
 	Packet* current_packet_;
 	std::deque<std::pair<unsigned char, Packet>> render_queue_;
