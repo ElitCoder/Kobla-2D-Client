@@ -23,6 +23,9 @@ else
 		build
 		
 		cd bin/
+		# for debugging
+		#valgrind --track-origins=yes ./Kobla-2D-Client-Rebased
+		# normal use
 		./Kobla-2D-Client-Rebased
 		cd ../
 	fi

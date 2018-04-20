@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "Map.h"
 #include "Character.h"
+#include "TemporaryObject.h"
 
 #include <deque>
 
@@ -40,16 +41,20 @@ private:
 	void removeCharacter(int id);
 	void setGameStatus(int status);
 	
+	void removeObjects(const std::vector<int>& ids);
+	
 	void handleSpawn();
 	void handleMove();
 	void handleAddPlayer();
 	void handleRemove();
 	void handleUpdateHealth();
+	void handleShoot();
 	
 	Map map_;
 	Character player_;
 	
 	std::vector<Character> players_;
+	std::vector<TemporaryObject> objects_;
 	
 	Packet* current_packet_;
 	std::deque<std::pair<unsigned char, Packet>> render_queue_;

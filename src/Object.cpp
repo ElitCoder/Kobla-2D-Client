@@ -1,6 +1,7 @@
 #include "Object.h"
 #include "Base.h"
 #include "PacketCreator.h"
+#include "Log.h"
 
 using namespace std;
 
@@ -36,6 +37,9 @@ double ObjectInformation::getScale() const {
 }
 
 const Animation& ObjectInformation::getAnimation(int direction) {
+	if (direction < 0)
+		Log(WARNING) << "direction < 0!\n";
+		
 	if (animations_.empty()) {
 		auto* texture = Base::engine().getTexture(texture_id_);
 		
@@ -63,6 +67,9 @@ const Animation& ObjectInformation::getAnimation(int direction) {
 			animations_.push_back(picture);
 		}
 	}
+	
+	if (animations_.empty())
+		Log(WARNING) << "animations_ is empty, there are no sprites available\n";
 	
 	if (direction < 0 || direction >= (int)animations_.size())
 		return animations_.front();

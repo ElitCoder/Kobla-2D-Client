@@ -9,6 +9,7 @@ public:
 	virtual void draw(sf::RenderWindow& window) override;
 	virtual void load(int id) override;
 	
+	// Needs updating the text as well
 	virtual void setPosition(double x, double y) override;
 	void updatePosition();
 	void setHealth(double full, double current);

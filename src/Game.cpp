@@ -38,6 +38,9 @@ void Game::process(Packet& packet) {
 		case HEADER_UPDATE_HEALTH: handleUpdateHealth();
 			break;
 			
+		case HEADER_SHOOT: handleShoot();
+			break;
+			
 		default: render_queue_.push_back({ header, packet });
 	}
 }
@@ -71,6 +74,15 @@ void Game::logic(sf::Clock& frame_clock) {
 	for (auto& player : players_)
 		if (player.move(frame_time))
 			player_.updatePosition();
+	
+	// Move Objects
+	vector<int> remove_objects_ids;
+	
+	for (auto& object : objects_)
+		if (!object.move(frame_time))
+			remove_objects_ids.push_back(object.getID());
+			
+	removeObjects(remove_objects_ids);		
 }
 
 void Game::render(sf::RenderWindow& window) {
@@ -102,6 +114,10 @@ void Game::render(sf::RenderWindow& window) {
 	// Render map first
 	map_.draw(window);
 	
+	// Render objects
+	for (auto& object : objects_)
+		object.draw(window);
+		
 	// Render other player before own player
 	for (auto& player : players_)
 		player.draw(window);
@@ -172,6 +188,12 @@ void Game::removeCharacter(int id) {
 	
 	if (is_player != players_.end())
 		players_.erase(is_player);
+}
+
+void Game::removeObjects(const vector<int>& ids) {
+	objects_.erase(remove_if(objects_.begin(), objects_.end(), [&ids] (auto& object) { 
+		return find(ids.begin(), ids.end(), object.getID()) != ids.end();
+	}), objects_.end());
 }
 
 bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
@@ -278,15 +300,15 @@ void Game::handleAddPlayer() {
 	auto moving = current_packet_->getBool();
 	auto direction = current_packet_->getInt();
 	
-	Character player;
+	players_.emplace_back();
+	auto& player = players_.back();
+	
 	readSpawnPlayer(player, *current_packet_);
 	
 	if (moving)
 		player.startMoving(direction, false);
 	else
 	 	player.stopMoving(false);
-		
-	players_.push_back(player);
 	
 	//Log(DEBUG) << "Added player with ID " << player.getID() << endl;
 }
@@ -321,4 +343,23 @@ void Game::handleUpdateHealth() {
 	
 	if (character->getID() == player_.getID())
 		Base::gui().updateHealthBar(full, current);
+}
+
+void Game::handleShoot() {
+	auto direction = current_packet_->getInt();
+	auto speed = current_packet_->getFloat();
+	auto object_type = current_packet_->getInt();
+	auto id = current_packet_->getInt();
+	auto x = current_packet_->getFloat();
+	auto y = current_packet_->getFloat();
+	
+	objects_.emplace_back();
+	auto& bullet = objects_.back();
+	
+	bullet.load(object_type);
+	bullet.setID(id);
+	bullet.setPosition(x, y);
+	bullet.setType(TEMP_OBJECT_BULLET);
+	bullet.setMovingSpeed(speed);
+	bullet.startMoving(direction, false);
 }
