@@ -1,12 +1,20 @@
+#pragma once
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include "Entity.h"
+#include <SFML/Graphics/RenderWindow.hpp>
 
-#define NORMAL_FONT		("CAPUT_TRIAL.ttf")
-#define NORMAL_FONT_ID	(0)
+#include <string>
+#include <vector>
 
 class ObjectInformation;
+
+namespace sf {
+	class Texture;
+	class Font;
+	class Event;
+	class RenderWindow;
+}
 
 class Engine {
 public:

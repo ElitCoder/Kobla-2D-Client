@@ -1,7 +1,13 @@
+#pragma once
 #ifndef TEXT_H
 #define TEXT_H
 
 #include "Entity.h"
+
+#include <SFML/Graphics/Text.hpp>
+
+#define NORMAL_FONT		("CAPUT_TRIAL.ttf")
+#define NORMAL_FONT_ID	(0)
 
 class Text : public Entity {
 public:
@@ -16,7 +22,7 @@ public:
 	sf::FloatRect getSize();
 	
 private:
-	sf::Text text_;	
+	sf::Text text_;
 };
 
 #endif

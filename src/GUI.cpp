@@ -1,6 +1,7 @@
 #include "GUI.h"
 #include "Log.h"
 #include "Base.h"
+#include "Game.h"
 
 using namespace std;
 

@@ -1,6 +1,13 @@
 #include "Engine.h"
 #include "Log.h"
 #include "Base.h"
+#include "Config.h"
+#include "GUI.h"
+#include "Game.h"
+
+#include <SFML/Graphics.hpp>
+
+#include <algorithm>
 
 using namespace std;
 

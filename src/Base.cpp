@@ -1,4 +1,9 @@
 #include "Base.h"
+#include "Config.h"
+#include "NetworkCommunication.h"
+#include "Game.h"
+#include "Engine.h"
+#include "GUI.h"
 
 Config Base::settings_;
 NetworkCommunication Base::network_;

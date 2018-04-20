@@ -1,7 +1,8 @@
+#pragma once
 #ifndef NETWORK_COMMUNICATION_H
 #define NETWORK_COMMUNICATION_H
 
-#include "Packet.h"
+//#include "Packet.h"
 
 #include <thread>
 #include <deque>
@@ -11,6 +12,9 @@
 enum NetworkConstants {
     BUFFER_SIZE = 4096
 };
+
+class Packet;
+class PartialPacket;
 
 class NetworkCommunication {
 public:

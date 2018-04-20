@@ -1,7 +1,14 @@
+#pragma once
 #ifndef GUI_H
 #define GUI_H
 
 #include "Entity.h"
+
+#include <TGUI/TGUI.hpp>
+
+namespace sf {
+	class View;
+}
 
 class GUI : public Entity {
 public:

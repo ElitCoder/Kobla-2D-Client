@@ -1,12 +1,13 @@
+#pragma once
 #ifndef GAME_H
 #define GAME_H
 
-#include "Packet.h"
+//#include "Packet.h"
 #include "Map.h"
 #include "Character.h"
 #include "TemporaryObject.h"
 
-#include <deque>
+#include <vector>
 
 // How to handle key presses
 enum {
@@ -14,6 +15,10 @@ enum {
 	GAME_STATUS_LOGINSCREEN,
 	GAME_STATUS_NONE
 };
+
+class Packet;
+class Object;
+class TemporaryObject;
 
 class Game {
 public:
@@ -24,8 +29,6 @@ public:
 	bool input(sf::Event& event);
 	
 	void render(sf::RenderWindow& window);
-	void processRender(unsigned char header);
-	void processRenderQueue();
 	
 	void pause();
 	void resume();
@@ -57,7 +60,6 @@ private:
 	std::vector<TemporaryObject> objects_;
 	
 	Packet* current_packet_;
-	std::deque<std::pair<unsigned char, Packet>> render_queue_;
 	
 	// Current game status, see enum above
 	int game_status_;

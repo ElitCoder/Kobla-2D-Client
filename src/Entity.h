@@ -1,11 +1,14 @@
+#pragma once
 #ifndef ENTITY_H
 #define ENTITY_H
 
 // SFML
-#include <SFML/Graphics.hpp>
-#include <TGUI/TGUI.hpp>
+//#include <SFML/Graphics.hpp>
+//#include <TGUI/TGUI.hpp>
 
-#include <string>
+namespace sf {
+	class RenderWindow;
+}
 
 /*
 	Entity is a class for general drawing and loading, everything is based on entities, e.g Characters, GUI and Objects

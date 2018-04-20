@@ -1,5 +1,7 @@
 #include "NetworkCommunication.h"
 #include "Log.h"
+#include "PartialPacket.h"
+#include "Packet.h"
 
 #include <cstring>
 #include <errno.h>

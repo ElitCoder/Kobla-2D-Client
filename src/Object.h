@@ -1,9 +1,15 @@
+#pragma once
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "Image.h"
+#include "Entity.h"
 #include "Config.h"
+#include "Image.h"
 #include "Timer.h"
+
+//#include <SFML/Graphics/Rect.hpp>
+
+#include <array>
 
 enum {
 	PLAYER_MOVE_RIGHT,
@@ -12,6 +18,12 @@ enum {
 	PLAYER_MOVE_UP,
 	PLAYER_MOVE_MAX
 };
+
+class Animation;
+
+namespace sf {
+	class Time;
+}
 
 class ObjectInformation {
 public:

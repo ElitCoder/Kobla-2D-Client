@@ -1,6 +1,10 @@
 #include "Log.h"
 #include "Base.h"
 #include "PacketCreator.h"
+#include "Engine.h"
+#include "NetworkCommunication.h"
+#include "Game.h"
+#include "Packet.h"
 
 using namespace std;
 

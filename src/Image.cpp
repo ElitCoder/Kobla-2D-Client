@@ -1,6 +1,11 @@
 #include "Image.h"
 #include "Base.h"
 #include "Log.h"
+#include "Object.h"
+#include "Engine.h"
+
+#include <SFML/System/Time.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 
 using namespace std;
 

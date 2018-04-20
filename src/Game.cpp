@@ -2,6 +2,10 @@
 #include "Log.h"
 #include "PacketCreator.h"
 #include "Base.h"
+#include "Packet.h"
+#include "TemporaryObject.h"
+#include "NetworkCommunication.h"
+#include "GUI.h"
 
 using namespace std;
 
@@ -41,15 +45,8 @@ void Game::process(Packet& packet) {
 		case HEADER_SHOOT: handleShoot();
 			break;
 			
-		default: render_queue_.push_back({ header, packet });
-	}
-}
-
-// Moving packets are more expensive, avoid at all costs
-void Game::processRender(unsigned char header) {
-	switch (header) {
 		default: Log(NETWORK) << "Unknown packet header " << header << endl;
-	}	
+	}
 }
 
 void Game::setGameStatus(int status) {
@@ -61,9 +58,6 @@ int Game::getGameStatus() {
 }
 
 void Game::logic(sf::Clock& frame_clock) {
-	// Go through rendering packets before doing logic
-	processRenderQueue();
-	
 	// Set frame time for animations
 	auto frame_time = frame_clock.restart();
 	
@@ -218,18 +212,6 @@ bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
 	}
 	
 	return false;
-}
-
-void Game::processRenderQueue() {
-	while (!render_queue_.empty()) {
-		auto header = render_queue_.front().first;
-		auto& packet = render_queue_.front().second;
-		
-		current_packet_ = &packet;
-		processRender(header);
-		
-		render_queue_.pop_front();
-	}
 }
 
 Map& Game::getMap() {

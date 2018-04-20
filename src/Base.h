@@ -1,11 +1,16 @@
+#pragma once
 #ifndef BASE_H
 #define BASE_H
 
-#include "Config.h"
-#include "NetworkCommunication.h"
-#include "Game.h"
-#include "Engine.h"
-#include "GUI.h"
+class Config;
+class NetworkCommunication;
+class Game;
+class Engine;
+class GUI;
+
+namespace sf {
+	class RenderWindow;
+}
 
 class Base {
 public:

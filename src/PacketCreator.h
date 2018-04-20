@@ -1,7 +1,10 @@
+#pragma once
 #ifndef PACKET_CREATOR_H
 #define PACKET_CREATOR_H
 
-#include "Packet.h"
+//#include "Packet.h"
+
+#include <string>
 
 enum {
 	HEADER_LOGIN,
@@ -15,6 +18,8 @@ enum {
 	HEADER_UPDATE_HEALTH,
 	HEADER_SHOOT
 };
+
+class Packet;
 
 class PacketCreator {
 public:

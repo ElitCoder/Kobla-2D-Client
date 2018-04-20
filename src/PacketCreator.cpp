@@ -1,4 +1,5 @@
 #include "PacketCreator.h"
+#include "Packet.h"
 
 using namespace std;
 
