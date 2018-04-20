@@ -31,10 +31,13 @@ static void packetThread() {
 }
 
 static void process() {
+	const string STANDARD_HOST = "localhost";
+	const unsigned short STANDARD_PORT = 11000;
+	
 	Log(DEBUG) << "Getting config options for network\n";
 	
-	const auto& hostname = Base::settings().get<string>("host");
-	const auto port = Base::settings().get<unsigned short>("port");
+	const auto& hostname = Base::settings().get<string>("host", STANDARD_HOST);
+	const auto port = Base::settings().get<unsigned short>("port", STANDARD_PORT);
 	
 	Log(DEBUG) << "Starting network and connecting\n";
 	Base::network().start(hostname, port);

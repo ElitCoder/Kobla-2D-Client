@@ -60,7 +60,7 @@ void Character::setPosition(double x, double y) {
 	image_.position(x, y);
 		
 	x_ = x;
-	y_ = y;	
+	y_ = y;
 }
 
 void Character::draw(sf::RenderWindow& window) {

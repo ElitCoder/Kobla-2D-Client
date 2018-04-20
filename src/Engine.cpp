@@ -18,11 +18,11 @@ Engine::~Engine() {
 }
 
 void Engine::start() {
-	int w = Base::settings().get<int>("resolution_w");
-	int h = Base::settings().get<int>("resolution_h");
+	int w = Base::settings().get<int>("resolution_w", 640);
+	int h = Base::settings().get<int>("resolution_h", 480);
 	
 	window_.create(sf::VideoMode(w, h), "Kobla-2D-Client");
-	window_.setVerticalSyncEnabled(Base::settings().get<bool>("vsync"));
+	window_.setVerticalSyncEnabled(Base::settings().get<bool>("vsync", false));
 	
 	// Create the GUI
 	Base::createGUI(window_);

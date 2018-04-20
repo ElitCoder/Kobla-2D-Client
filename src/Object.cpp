@@ -12,24 +12,20 @@ using namespace std;
 void ObjectInformation::setConfig(const Config& config) {
 	config_ = config;
 	
-	try {
-		animated_ = config_.get<bool>("animated");
-		texture_id_ = config_.get<int>("texture");
-		scale_ = config_.get<double>("scale");
-		
-		collision_scale_x = config_.get<double>("collision_scale_x");
-		collision_scale_y = config_.get<double>("collision_scale_y");
-		
-		if (animated_) {
-			// Same order as enum PLAYER_MOVE_*
-			animation_lines_.push_back(config_.get<int>("animation_right"));
-			animation_lines_.push_back(config_.get<int>("animation_down"));
-			animation_lines_.push_back(config_.get<int>("animation_left"));
-			animation_lines_.push_back(config_.get<int>("animation_up"));
-		}	
-	} catch (NoConfigException& exception) {
-		// Config doesn't need to hold these values
+	texture_id_ = config_.get<int>("texture", -1);
+	scale_ = config_.get<double>("scale", 1);
+	animated_ = config_.get<bool>("animated", false);
+	
+	// Set size
+	if (animated_) {
+		animation_lines_.push_back(config_.get<int>("animation_right", -1));
+		animation_lines_.push_back(config_.get<int>("animation_down", -1));
+		animation_lines_.push_back(config_.get<int>("animation_left", -1));
+		animation_lines_.push_back(config_.get<int>("animation_up", -1));
 	}
+	
+	collision_scale_x = config_.get<double>("collision_scale_x", 1);
+	collision_scale_y = config_.get<double>("collision_scale_y", 1);
 }
 
 double ObjectInformation::getScale() const {
@@ -287,8 +283,8 @@ sf::FloatRect Object::getCollisionBox(bool only_boots) {
 bool Object::isCollision(const sf::FloatRect& box) {
 	if (!collision_)
 		return false;
-		
-	return box.intersects(getCollisionBox(true));
+	
+	return box.intersects(image_.internal().getGlobalBounds());
 }
 
 void Object::setPredeterminedDistance(double distance) {
