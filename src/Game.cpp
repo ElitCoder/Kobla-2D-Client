@@ -135,10 +135,6 @@ bool Game::input(sf::Event& event) {
 	
 	if (getGameStatus() == GAME_STATUS_INGAME) {
 		// Enable key presses for movement etc
-		// Shooting
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-			// Send packet that we're shooting
-			Base::network().send(PacketCreator::shoot());
 		
 		// Movement
 		int direction = -1;
@@ -156,6 +152,13 @@ bool Game::input(sf::Event& event) {
 			player_.stopMoving(true);
 		else
 			player_.startMoving(direction, true);
+			
+		// It's only possible to shoot if we're not moving
+		if (!player_.isMoving()) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+				// Send packet that we're shooting
+				Base::network().send(PacketCreator::shoot());	
+		}
 			
 		switch (event.type) {
 			default: handled = false;

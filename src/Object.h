@@ -55,6 +55,7 @@ public:
 	double getPredetermindedDistance() const;
 	
 	bool isCollision(const sf::FloatRect& box);
+	bool isMoving() const;
 	
 protected:
 	bool isPlayerInsideMap(const sf::FloatRect& box);

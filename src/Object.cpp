@@ -82,7 +82,7 @@ array<double, 2> ObjectInformation::getCollisionScale() const {
 }
 
 /*
-	Character
+	Object
 */
 
 void Object::draw(sf::RenderWindow& window) {
@@ -297,4 +297,8 @@ void Object::setPredeterminedDistance(double distance) {
 
 double Object::getPredetermindedDistance() const {
 	return predetermined_distance_;
+}
+
+bool Object::isMoving() const {
+	return moving_;
 }
