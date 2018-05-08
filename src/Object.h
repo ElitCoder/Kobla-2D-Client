@@ -7,8 +7,6 @@
 #include "Image.h"
 #include "Timer.h"
 
-//#include <SFML/Graphics/Rect.hpp>
-
 #include <array>
 
 enum {
@@ -17,6 +15,21 @@ enum {
 	PLAYER_MOVE_LEFT,
 	PLAYER_MOVE_UP,
 	PLAYER_MOVE_MAX
+};
+
+enum {
+	COLLISION_PLAYERS,
+	COLLISION_NPCS,
+	COLLISION_MONSTERS,
+	COLLISION_MAP,
+	COLLISION_MAX
+};
+
+enum {
+	OBJECT_TYPE_PLAYER,
+	OBJECT_TYPE_MONSTER,
+	OBJECT_TYPE_NPC,
+	OBJECT_TYPE_TEMP
 };
 
 class Animation;
@@ -48,14 +61,18 @@ private:
 
 class Object : public Entity {
 public:
+	static int translateObjectTypeToCollision(int type);
+	
 	virtual void draw(sf::RenderWindow& window) override;
 	virtual void load(int id) override;
 	
 	virtual void setPosition(double x, double y);
 	void setID(size_t id);
 	void setMovingSpeed(double speed);
-	void setCollision(bool collision);
+	void setCollisions(const std::vector<bool>& collisions);
+	void setColliding(bool status);
 	void setPredeterminedDistance(double distance);
+	void setObjectType(int type);
 	
 	void startMoving(int direction, bool tell_server);
 	bool move(sf::Time& frame_time);
@@ -65,9 +82,12 @@ public:
 	double getX() const;
 	double getY() const;
 	double getPredetermindedDistance() const;
+	bool getCollision(int type) const;
+	int getObjectType() const;
 	
 	bool isCollision(const sf::FloatRect& box);
 	bool isMoving() const;
+	bool isColliding() const;
 	
 protected:
 	bool isPlayerInsideMap(const sf::FloatRect& box);
@@ -88,11 +108,14 @@ protected:
 	int direction_;
 	double moving_speed_;
 	bool moving_					= false;
-	bool collision_					= false;
 	double predetermined_distance_	= -1;
 	double distance_moved_ 			= 0;
 	
-	int object_id_ = -1;
+	std::vector<bool> collisions_;
+	bool colliding_					= false;
+	
+	int object_id_					= -1;
+	int object_type_				= -1;
 };
 
 #endif

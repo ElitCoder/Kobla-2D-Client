@@ -85,6 +85,19 @@ array<double, 2> ObjectInformation::getCollisionScale() const {
 	Object
 */
 
+// Static since translation doesn't need an instance
+int Object::translateObjectTypeToCollision(int type) {
+	switch (type) {
+		case OBJECT_TYPE_MONSTER:	return COLLISION_MONSTERS;
+		case OBJECT_TYPE_NPC:		return COLLISION_NPCS;
+		case OBJECT_TYPE_PLAYER:	return COLLISION_PLAYERS;
+	}
+	
+	Log(WARNING) << "Object type translation " << type << " failed\n";
+	
+	return -1;
+}
+
 void Object::draw(sf::RenderWindow& window) {
 	image_.draw(window);
 	//text_.draw(window);
@@ -101,10 +114,6 @@ void Object::load(int id) {
 	image_.internal().setFrameTime(sf::seconds(frame_time));
 	
 	object_id_ = id;
-}
-
-void Object::setCollision(bool collision) {
-	collision_ = collision;
 }
 
 void Object::setPosition(double x, double y) {
@@ -285,9 +294,6 @@ sf::FloatRect Object::getCollisionBox(bool only_boots) {
 }
 
 bool Object::isCollision(const sf::FloatRect& box) {
-	if (!collision_)
-		return false;
-	
 	return box.intersects(image_.internal().getGlobalBounds());
 }
 
@@ -301,4 +307,34 @@ double Object::getPredetermindedDistance() const {
 
 bool Object::isMoving() const {
 	return moving_;
+}
+
+void Object::setObjectType(int type) {
+	object_type_ = type;
+}
+
+void Object::setColliding(bool status) {
+	colliding_ = status;
+}
+
+void Object::setCollisions(const vector<bool>& collisions) {
+	collisions_ = collisions;
+}
+
+bool Object::getCollision(int type) const {
+	if (type >= (int)collisions_.size() || type < 0) {
+		Log(WARNING) << "Trying to get collision information with not populated collisions_\n";
+		
+		return false;
+	}
+		
+	return collisions_.at(type);
+}
+
+bool Object::isColliding() const {
+	return colliding_;
+}
+
+int Object::getObjectType() const {
+	return object_type_;
 }

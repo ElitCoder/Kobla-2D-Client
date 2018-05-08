@@ -194,28 +194,43 @@ void Game::removeObjects(const vector<int>& ids) {
 }
 
 bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
-	if (map_.isCollision(bound))
-		return true;
-	
-	// Check if our own player is colliding
-	if (moving_player.getID() != player_.getID())
-		if (player_.isCollision(bound))
+	if (moving_player.getCollision(COLLISION_MAP))
+		if (map_.isCollision(bound))
 			return true;
 	
+	// Check if our own player is colliding
+	if (moving_player.getCollision(COLLISION_PLAYERS))
+		if (moving_player.getID() != player_.getID())
+			if (player_.isCollision(bound))
+				return true;
+		
 	// Check other collision players
 	for (auto& player : players_) {
 		if (player.getID() == moving_player.getID())
 			continue;
 			
+		if (!moving_player.getCollision(Object::translateObjectTypeToCollision(player.getObjectType())) && !player.isColliding())
+			continue;
+
 		if (player.isCollision(bound))
 			return true;
-	}
+	}		
 	
 	return false;
 }
 
 Map& Game::getMap() {
 	return map_;
+}
+
+static vector<bool> readCollisionInformation(Packet& packet) {
+	vector<bool> collisions;
+	auto collisions_size = packet.getInt();
+	
+	for (int i = 0; i < collisions_size; i++)
+		collisions.push_back(packet.getBool());
+		
+	return collisions;
 }
 
 static void readSpawnPlayer(Character& player, Packet& packet) {
@@ -225,18 +240,22 @@ static void readSpawnPlayer(Character& player, Packet& packet) {
 	auto y = packet.getFloat();
 	auto name = packet.getString();
 	auto moving_speed = packet.getFloat();
-	auto collision = packet.getBool();
+	auto collisions = readCollisionInformation(packet);
+	auto colliding = packet.getBool();
 	auto full_health = packet.getFloat();
 	auto current_health = packet.getFloat();
+	auto object_type = packet.getInt();
 	
 	// Load player
 	player.load(player_image_id);
 	player.setName(name);
 	player.setPosition(x, y);
 	player.setMovingSpeed(moving_speed);
-	player.setCollision(collision);
+	player.setCollisions(collisions);
+	player.setColliding(colliding);
 	player.setID(id);
 	player.setHealth(full_health, current_health);
+	player.setObjectType(object_type);
 }
 
 void Game::handleSpawn() {
@@ -337,6 +356,7 @@ void Game::handleShoot() {
 	auto id = current_packet_->getInt();
 	auto x = current_packet_->getFloat();
 	auto y = current_packet_->getFloat();
+	auto collisions = readCollisionInformation(*current_packet_);
 	
 	objects_.emplace_back();
 	auto& bullet = objects_.back();
@@ -345,6 +365,7 @@ void Game::handleShoot() {
 	bullet.setID(id);
 	bullet.setPosition(x, y);
 	bullet.setType(TEMP_OBJECT_BULLET);
+	bullet.setCollisions(collisions);
 	bullet.setMovingSpeed(speed);
 	bullet.startMoving(direction, false);
 }
