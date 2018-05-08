@@ -147,14 +147,18 @@ bool Game::input(sf::Event& event) {
 		else
 			player_.startMoving(direction, true);
 			
-		// It's only possible to shoot if we're not moving
-		if (!player_.isMoving()) {
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-				// Send packet that we're shooting
-				Base::network().send(PacketCreator::shoot());	
-		}
-			
 		switch (event.type) {
+			case sf::Event::KeyPressed: {
+				if (event.key.code == sf::Keyboard::S) {
+					// It's only possible to shoot if we're not moving
+					if (!player_.isMoving())
+						// Send packet that we're shooting
+						Base::network().send(PacketCreator::shoot());
+				}
+				
+				break;
+			}
+			
 			default: handled = false;
 		}
 	} else if (getGameStatus() == GAME_STATUS_NONE) {
@@ -188,6 +192,9 @@ void Game::removeCharacter(int id) {
 }
 
 void Game::removeObjects(const vector<int>& ids) {
+	if (ids.empty())
+		return;
+
 	objects_.erase(remove_if(objects_.begin(), objects_.end(), [&ids] (auto& object) { 
 		return find(ids.begin(), ids.end(), object.getID()) != ids.end();
 	}), objects_.end());
@@ -321,6 +328,7 @@ void Game::handleRemove() {
 	auto id = current_packet_->getInt();
 	
 	removeCharacter(id);
+	removeObjects({ id });
 }
 
 Character* Game::getCharacter(int id) {
