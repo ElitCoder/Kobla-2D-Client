@@ -309,12 +309,12 @@ void Game::handleAddPlayer() {
 	
 	readSpawnPlayer(player, *current_packet_);
 	
+	player.setDirection(direction);
+	
 	if (moving)
 		player.startMoving(direction, false);
 	else
 	 	player.stopMoving(false);
-	
-	//Log(DEBUG) << "Added player with ID " << player.getID() << endl;
 }
 
 void Game::handleRemove() {

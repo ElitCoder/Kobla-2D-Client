@@ -73,6 +73,7 @@ public:
 	void setColliding(bool status);
 	void setPredeterminedDistance(double distance);
 	void setObjectType(int type);
+	void setDirection(int direction);
 	
 	void startMoving(int direction, bool tell_server);
 	bool move(sf::Time& frame_time);

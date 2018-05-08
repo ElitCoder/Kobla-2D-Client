@@ -338,3 +338,9 @@ bool Object::isColliding() const {
 int Object::getObjectType() const {
 	return object_type_;
 }
+
+void Object::setDirection(int direction) {
+	direction_ = direction;
+	
+	image_.setAnimation(direction);
+}
