@@ -2,8 +2,6 @@
 #ifndef PACKET_CREATOR_H
 #define PACKET_CREATOR_H
 
-//#include "Packet.h"
-
 #include <string>
 
 enum {
@@ -30,7 +28,7 @@ public:
 	static Packet spawn();
 	static Packet move(double x, double y, int direction, bool moving);
 	static Packet shoot();
-	static Packet hit();
+	static Packet hit(int object_id, int hit_id);
 };
 
 #endif

@@ -9,6 +9,9 @@
 
 using namespace std;
 
+// Single-threaded only, keep track of what Object hitted last
+int g_last_collision_id_ = -1;
+
 Game::Game() :
 	map_() {
 	game_status_ = GAME_STATUS_NONE;
@@ -74,15 +77,16 @@ void Game::logic(sf::Clock& frame_clock) {
 	
 	for (auto& object : objects_) {
 		if (!object.move(frame_time)) {
-			// Tell the Server that we hit something if it's our bullet
-			if ((int)player_.getID() == object.getOwner())
-				Base::network().send(PacketCreator::hit());
+			// Tell the Server that we hit something if it's our bullet and the hit is not the map (g_last_collision_id_ > 0)
+			if (g_last_collision_id_ > 0)
+				if ((int)player_.getID() == object.getOwner())
+					Base::network().send(PacketCreator::hit(object.getID(), g_last_collision_id_));
 			
 			remove_objects_ids.push_back(object.getID());
 		}
 	}
 		
-	removeObjects(remove_objects_ids);		
+	removeObjects(remove_objects_ids);
 }
 
 void Game::render(sf::RenderWindow& window) {
@@ -214,8 +218,11 @@ bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
 	// Check if our own player is colliding
 	if (moving_player.getCollision(COLLISION_PLAYERS))
 		if (moving_player.getID() != player_.getID())
-			if (player_.isCollision(bound))
+			if (player_.isCollision(bound)) {
+				g_last_collision_id_ = player_.getID();
+				
 				return true;
+			}
 		
 	// Check other collision players
 	for (auto& player : players_) {
@@ -225,8 +232,11 @@ bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
 		if (!moving_player.getCollision(Object::translateObjectTypeToCollision(player.getObjectType())) && !player.isColliding())
 			continue;
 
-		if (player.isCollision(bound))
+		if (player.isCollision(bound)) {
+			g_last_collision_id_ = player.getID();
+			
 			return true;
+		}
 	}		
 	
 	return false;

@@ -9,6 +9,8 @@
 
 using namespace std;
 
+extern int g_last_collision_id_;
+
 /*
 	ObjectInformation
 */
@@ -161,6 +163,8 @@ void Object::stopMoving(bool tell_server) {
 }
 
 bool Object::move(sf::Time& frame_time) {
+	g_last_collision_id_ = -1;
+	
 	image_.setAnimation(direction_);
 	
 	if (!moving_) {

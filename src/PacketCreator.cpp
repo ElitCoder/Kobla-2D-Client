@@ -50,9 +50,11 @@ Packet PacketCreator::shoot() {
 	return packet;
 }
 
-Packet PacketCreator::hit() {
+Packet PacketCreator::hit(int object_id, int hit_id) {
 	Packet packet;
 	packet.addHeader(HEADER_HIT);
+	packet.addInt(object_id);
+	packet.addInt(hit_id);
 	packet.finalize();
 	
 	return packet;
