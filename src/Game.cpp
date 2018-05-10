@@ -74,8 +74,9 @@ void Game::logic(sf::Clock& frame_clock) {
 	
 	for (auto& object : objects_) {
 		if (!object.move(frame_time)) {
-			// Tell the Server that we hit something
-			Base::network().send(PacketCreator::hit());
+			// Tell the Server that we hit something if it's our bullet
+			if ((int)player_.getID() == object.getOwner())
+				Base::network().send(PacketCreator::hit());
 			
 			remove_objects_ids.push_back(object.getID());
 		}
@@ -369,6 +370,7 @@ void Game::handleShoot() {
 	auto id = current_packet_->getInt();
 	auto x = current_packet_->getFloat();
 	auto y = current_packet_->getFloat();
+	auto owner = current_packet_->getInt();
 	auto collisions = readCollisionInformation(*current_packet_);
 	
 	objects_.emplace_back();
@@ -380,5 +382,6 @@ void Game::handleShoot() {
 	bullet.setType(TEMP_OBJECT_BULLET);
 	bullet.setCollisions(collisions);
 	bullet.setMovingSpeed(speed);
+	bullet.setOwner(owner);
 	bullet.startMoving(direction, false);
 }

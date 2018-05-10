@@ -171,6 +171,23 @@ static string findDataId(vector<pair<int, string>>& container, int id) {
 	return (*iterator).second;
 }
 
+// Force pre-loading everything
+void Engine::runWarm() {
+	getFont(NORMAL_FONT);
+	
+	// Load up vectors
+	getTextureName(0);
+	getMapName(0);
+	getObjectInformationName(0);
+	
+	// Load data from disk
+	for (auto& peer : texture_names_)
+		getTexture(peer.first);
+		
+	for (auto& peer : object_names_)
+		getObjectInformation(peer.first);
+}
+
 string Engine::getMapName(int id) {
 	loadDataID(map_names_, "data/maps/id");
 	

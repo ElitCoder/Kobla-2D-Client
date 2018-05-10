@@ -12,8 +12,12 @@ class TemporaryObject : public Object {
 public:
 	void setType(int type);
 	
+	void setOwner(int id);
+	int getOwner() const;
+	
 private:
-	int object_type_ = -1;
+	int object_type_ 	= -1;
+	int owner_			= -1;
 };
 
 #endif

@@ -39,6 +39,8 @@ public:
 	
 	std::string getMapName(int id);
 	
+	void runWarm();
+	
 private:
 	std::string getTextureName(int id);
 	std::string getObjectInformationName(int id);

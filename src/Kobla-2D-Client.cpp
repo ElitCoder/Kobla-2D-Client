@@ -18,6 +18,12 @@ static void printStart() {
 static void load() {
 	Base::engine().start();
 	Base::engine().load();
+	
+	// Run warm
+	auto run_warm = Base::settings().get<bool>("run_warm", 1);
+	
+	if (run_warm)
+		Base::engine().runWarm();
 }
 
 static void packetThread() {

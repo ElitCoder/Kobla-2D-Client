@@ -6,3 +6,6 @@ port: 11000
 vsync: 1
 resolution_w: 800
 resolution_h: 600
+
+# Preload
+run_warm: 1
