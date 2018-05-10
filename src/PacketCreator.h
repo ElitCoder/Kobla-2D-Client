@@ -16,10 +16,12 @@ enum {
 	HEADER_ADD_PLAYER,
 	HEADER_REMOVE_CHARACTER,
 	HEADER_UPDATE_HEALTH,
-	HEADER_SHOOT
+	HEADER_SHOOT,
+	HEADER_HIT
 };
 
 class Packet;
+class Object;
 
 class PacketCreator {
 public:
@@ -28,6 +30,7 @@ public:
 	static Packet spawn();
 	static Packet move(double x, double y, int direction, bool moving);
 	static Packet shoot();
+	static Packet hit();
 };
 
 #endif

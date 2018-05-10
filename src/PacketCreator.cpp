@@ -1,5 +1,6 @@
 #include "PacketCreator.h"
 #include "Packet.h"
+#include "Object.h"
 
 using namespace std;
 
@@ -44,6 +45,14 @@ Packet PacketCreator::move(double x, double y, int direction, bool moving) {
 Packet PacketCreator::shoot() {
 	Packet packet;
 	packet.addHeader(HEADER_SHOOT);
+	packet.finalize();
+	
+	return packet;
+}
+
+Packet PacketCreator::hit() {
+	Packet packet;
+	packet.addHeader(HEADER_HIT);
 	packet.finalize();
 	
 	return packet;

@@ -72,10 +72,15 @@ void Game::logic(sf::Clock& frame_clock) {
 	// Move Objects
 	vector<int> remove_objects_ids;
 	
-	for (auto& object : objects_)
-		if (!object.move(frame_time))
-			remove_objects_ids.push_back(object.getID());
+	for (auto& object : objects_) {
+		if (!object.move(frame_time)) {
+			// Tell the Server that we hit something
+			Base::network().send(PacketCreator::hit());
 			
+			remove_objects_ids.push_back(object.getID());
+		}
+	}
+		
 	removeObjects(remove_objects_ids);		
 }
 
