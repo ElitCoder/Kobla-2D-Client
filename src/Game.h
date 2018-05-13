@@ -2,7 +2,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-//#include "Packet.h"
 #include "Map.h"
 #include "Character.h"
 #include "TemporaryObject.h"
@@ -64,6 +63,7 @@ private:
 	
 	std::vector<Character> players_;
 	std::vector<TemporaryObject> objects_;
+	std::vector<std::pair<Text, Timer>> text_;
 	
 	Packet* current_packet_;
 	

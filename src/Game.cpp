@@ -90,6 +90,11 @@ void Game::logic(sf::Clock& frame_clock) {
 	}
 		
 	removeObjects(remove_objects_ids);
+	
+	// Remove Text if the Timer elapsed
+	text_.erase(remove_if(text_.begin(), text_.end(), [] (auto& text) {
+		return text.second.elapsed();
+	}), text_.end());
 }
 
 void Game::render(sf::RenderWindow& window) {
@@ -121,15 +126,19 @@ void Game::render(sf::RenderWindow& window) {
 	// Render map first
 	map_.draw(window);
 	
-	// Render objects
-	for (auto& object : objects_)
-		object.draw(window);
-		
 	// Render other player before own player
 	for (auto& player : players_)
 		player.draw(window);
 		
 	player_.draw(window);
+	
+	// Render objects
+	for (auto& object : objects_)
+		object.draw(window);
+		
+	// Render text
+	for (auto& text : text_)
+		text.first.draw(window);
 }
 
 // Return false if the event was not handled
@@ -428,6 +437,22 @@ void Game::handleShoot() {
 
 void Game::handleText() {
 	auto text = current_packet_->getString();
+	auto ms = current_packet_->getInt();
+	auto id = current_packet_->getInt();
 	
 	Log(DEBUG) << text << endl;
+	
+	auto* character = getCharacter(id);
+	
+	if (character == nullptr)
+		return;
+	
+	Text draw_text;
+	draw_text.load(NORMAL_FONT_ID);
+	draw_text.set(text);
+	draw_text.size(18);
+	draw_text.color(sf::Color::White);
+	draw_text.position(character->getX() + 24, character->getY() - draw_text.getSize().height - 24);
+	
+	text_.push_back({ draw_text, Timer(ms) });
 }
