@@ -57,6 +57,7 @@ private:
 	void handleRemove();
 	void handleUpdateHealth();
 	void handleShoot();
+	void handleText();
 	
 	Map map_;
 	Character player_;

@@ -48,6 +48,9 @@ void Game::process(Packet& packet) {
 		case HEADER_SHOOT: handleShoot();
 			break;
 			
+		case HEADER_TEXT: handleText();
+			break;
+			
 		default: Log(NETWORK) << "Unknown packet header " << header << endl;
 	}
 }
@@ -260,6 +263,10 @@ Object* Game::getActivateObject(Object* character) {
 	Object* target = nullptr;
 	
 	for (auto& player : players_) {
+		// Only activate NPCs for now
+		if (player.getObjectType() != OBJECT_TYPE_NPC)
+			continue;
+		
 		auto distance = character->getDistanceTo(&player);
 		
 		if (distance < OBJECT_CLOSE_DISTANCE)
@@ -417,4 +424,10 @@ void Game::handleShoot() {
 	bullet.setMovingSpeed(speed);
 	bullet.setOwner(owner);
 	bullet.startMoving(direction, false);
+}
+
+void Game::handleText() {
+	auto text = current_packet_->getString();
+	
+	Log(DEBUG) << text << endl;
 }
