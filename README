@@ -8,3 +8,6 @@ ESSENTIALS:
 
 BUILDING:
 ./create.sh
+
+RUNNING:
+./create.sh run
