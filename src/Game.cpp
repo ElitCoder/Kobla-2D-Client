@@ -273,7 +273,7 @@ Object* Game::getActivateObject(Object* character) {
 	
 	for (auto& player : players_) {
 		// Only activate NPCs for now
-		if (player.getObjectType() != OBJECT_TYPE_NPC)
+		if (!(player.getObjectType() == OBJECT_TYPE_NPC || player.getObjectType() == OBJECT_TYPE_MONSTER))
 			continue;
 		
 		auto distance = character->getDistanceTo(&player);
