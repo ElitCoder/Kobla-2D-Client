@@ -348,3 +348,22 @@ void Object::setDirection(int direction) {
 	
 	image_.setAnimation(direction);
 }
+
+Image& Object::getImage() {
+	return image_;
+}
+
+double Object::getDistanceTo(Object* object) {
+	auto first_size = image_.getSize();
+	auto second_size = object->getImage().getSize();
+	
+	double first_x = getX() + first_size.left / 2.0;
+	double first_y = getY() + first_size.top / 2.0;
+	
+	double second_x = object->getX() + second_size.left / 2.0;
+	double second_y = object->getY() + second_size.top / 2.0;
+	
+	double distance = pow(first_x - second_x, 2) + pow(first_y - second_y, 2);
+	
+	return sqrt(distance);
+}

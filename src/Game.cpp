@@ -164,6 +164,14 @@ bool Game::input(sf::Event& event) {
 					if (!player_.isMoving())
 						// Send packet that we're shooting
 						Base::network().send(PacketCreator::shoot());
+				} else if (event.key.code == sf::Keyboard::E) {
+					// Activate
+					Object* activate = getActivateObject(&player_);
+					
+					if (activate != nullptr) {
+						// Tell Server we want to activate something
+						Base::network().send(PacketCreator::activate(activate));
+					}
 				}
 				
 				break;
@@ -244,6 +252,21 @@ bool Game::isCollision(const sf::FloatRect& bound, Object& moving_player) {
 
 Map& Game::getMap() {
 	return map_;
+}
+
+Object* Game::getActivateObject(Object* character) {
+	// Find closest object from centre - centre
+	// Only NPCs for now
+	Object* target = nullptr;
+	
+	for (auto& player : players_) {
+		auto distance = character->getDistanceTo(&player);
+		
+		if (distance < OBJECT_CLOSE_DISTANCE)
+			return &player;
+	}
+	
+	return target;
 }
 
 static vector<bool> readCollisionInformation(Packet& packet) {

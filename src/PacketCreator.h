@@ -15,7 +15,8 @@ enum {
 	HEADER_REMOVE_CHARACTER,
 	HEADER_UPDATE_HEALTH,
 	HEADER_SHOOT,
-	HEADER_HIT
+	HEADER_HIT,
+	HEADER_ACTIVATE
 };
 
 class Packet;
@@ -29,6 +30,7 @@ public:
 	static Packet move(double x, double y, int direction, bool moving);
 	static Packet shoot();
 	static Packet hit(int object_id, int hit_id);
+	static Packet activate(Object* object);
 };
 
 #endif

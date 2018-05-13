@@ -9,6 +9,10 @@
 
 #include <vector>
 
+enum {
+	OBJECT_CLOSE_DISTANCE = 100
+};
+
 // How to handle key presses
 enum {
 	GAME_STATUS_INGAME,
@@ -40,6 +44,7 @@ public:
 	
 private:
 	Character* getCharacter(int id);
+	Object* getActivateObject(Object* character);
 	
 	void removeCharacter(int id);
 	void setGameStatus(int status);

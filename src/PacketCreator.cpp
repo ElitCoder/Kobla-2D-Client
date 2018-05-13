@@ -59,3 +59,12 @@ Packet PacketCreator::hit(int object_id, int hit_id) {
 	
 	return packet;
 }
+
+Packet PacketCreator::activate(Object* object) {
+	Packet packet;
+	packet.addHeader(HEADER_ACTIVATE);
+	packet.addInt(object->getID());
+	packet.finalize();
+	
+	return packet;
+}

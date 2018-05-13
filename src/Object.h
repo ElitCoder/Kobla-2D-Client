@@ -85,6 +85,8 @@ public:
 	double getPredetermindedDistance() const;
 	bool getCollision(int type) const;
 	int getObjectType() const;
+	double getDistanceTo(Object* object);
+	Image& getImage();
 	
 	bool isCollision(const sf::FloatRect& box);
 	bool isMoving() const;
