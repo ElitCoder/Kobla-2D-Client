@@ -205,6 +205,11 @@ bool Object::move(sf::Time& frame_time) {
 		
 		double distance = diff_x_squared + diff_y_squared;
 		
+		if (sqrt(distance) < 1) {
+			is_reaching_x = true;
+			is_reaching_y = true;
+		}
+		
 		double move_x = diff_x_squared / distance * pixels;
 		double move_y = diff_y_squared / distance * pixels;
 		
@@ -214,15 +219,27 @@ bool Object::move(sf::Time& frame_time) {
 		if (move_y >= abs(diff_y))
 			is_reaching_y = true;
 			
-		if (diff_x < 0)
+		if (diff_x < 0) {
 			x -= move_x;
-		else
+			
+			direction_ = PLAYER_MOVE_LEFT;
+		} else {
 			x += move_x;
+			
+			direction_ = PLAYER_MOVE_RIGHT;
+		}
 		
-		if (diff_y < 0)
+		if (diff_y < 0) {
 			y -= move_y;
-		else
+			
+			if (move_y > move_x)
+				direction_ = PLAYER_MOVE_UP;
+		} else {
 			y += move_y;
+			
+			if (move_y > move_x)
+				direction_ = PLAYER_MOVE_DOWN;
+		}
 	} else {
 		switch (direction_) {
 			case PLAYER_MOVE_UP: y -= pixels;

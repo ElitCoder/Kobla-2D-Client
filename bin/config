@@ -11,4 +11,4 @@ resolution_h: 600
 run_warm: 1
 
 # Debug
-enable_debug: 0
+enable_debug: 1
