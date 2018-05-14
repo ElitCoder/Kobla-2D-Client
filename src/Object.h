@@ -44,6 +44,7 @@ public:
 	
 	const Animation& getAnimation(int direction);
 	double getScale() const;
+	double getAnimationSpeed() const;
 	
 	std::array<double, 2> getCollisionScale() const;
 	
@@ -53,6 +54,7 @@ private:
 	std::vector<int> animation_lines_;
 	std::vector<Animation> animations_;
 	bool animated_				= false;
+	double animation_speed_		= 1;
 	int texture_id_				= -1;
 	double scale_				= 1;
 	double collision_scale_x	= 1;

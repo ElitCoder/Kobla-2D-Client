@@ -28,6 +28,8 @@ void ObjectInformation::setConfig(const Config& config) {
 		animation_lines_.push_back(config_.get<int>("animation_down", -1));
 		animation_lines_.push_back(config_.get<int>("animation_left", -1));
 		animation_lines_.push_back(config_.get<int>("animation_up", -1));
+		
+		animation_speed_ = 1.0 / config_.get<double>("animation_speed", animation_speed_);
 	}
 	
 	collision_scale_x = config_.get<double>("collision_scale_x", 1);
@@ -36,6 +38,10 @@ void ObjectInformation::setConfig(const Config& config) {
 
 double ObjectInformation::getScale() const {
 	return scale_;
+}
+
+double ObjectInformation::getAnimationSpeed() const {
+	return animation_speed_;
 }
 
 const Animation& ObjectInformation::getAnimation(int direction) {
@@ -52,7 +58,7 @@ const Animation& ObjectInformation::getAnimation(int direction) {
 				direction.setSpriteSheet(*texture);
 				
 				// Get size of texture
-				int size = texture->getSize().y / animation_lines_.size();
+				int size = lround((double)texture->getSize().y / (double)animation_lines_.size());
 				
 				for (size_t i = 0; i < texture->getSize().x; i += size)
 					direction.addFrame(sf::IntRect(i, line * size, size, size));

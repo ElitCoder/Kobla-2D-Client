@@ -76,7 +76,7 @@ void Character::load(int id) {
 	image_.scale(Base::engine().getObjectInformation(id).getScale());
 	
 	// Set animation speed based on movement speed (this fits the animated player for now)
-	double frame_time = (1 / moving_speed_) * 10;
+	double frame_time = (1.0 / moving_speed_) * 10.0 * Base::engine().getObjectInformation(id).getAnimationSpeed();
 	image_.internal().setFrameTime(sf::seconds(frame_time));
 	
 	object_id_ = id;
