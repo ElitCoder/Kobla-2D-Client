@@ -73,9 +73,9 @@ public:
 	void setMovingSpeed(double speed);
 	void setCollisions(const std::vector<bool>& collisions);
 	void setColliding(bool status);
-	void setPredeterminedDistance(double distance);
 	void setObjectType(int type);
 	void setDirection(int direction);
+	void setDeterminedDestination(double x, double y);
 	
 	void startMoving(int direction, bool tell_server);
 	bool move(sf::Time& frame_time);
@@ -84,7 +84,6 @@ public:
 	size_t getID() const;
 	double getX() const;
 	double getY() const;
-	double getPredetermindedDistance() const;
 	bool getCollision(int type) const;
 	int getObjectType() const;
 	double getDistanceTo(Object* object);
@@ -95,6 +94,8 @@ public:
 	bool isColliding() const;
 	
 protected:
+	Object();
+	
 	bool isPlayerInsideMap(const sf::FloatRect& box);
 	sf::FloatRect getCollisionBox(bool only_boots);
 	
@@ -111,10 +112,13 @@ protected:
 	
 	Timer started_moving_;
 	int direction_;
-	double moving_speed_;
+	double moving_speed_			= -1;
 	bool moving_					= false;
-	double predetermined_distance_	= -1;
-	double distance_moved_ 			= 0;
+	double destination_x_			= -1;
+	double destination_y_			= -1;
+	bool reached_distance_x_		= false;
+	bool reached_distance_y_		= false;
+	bool determined_destination_	= false;
 	
 	std::vector<bool> collisions_;
 	bool colliding_					= false;

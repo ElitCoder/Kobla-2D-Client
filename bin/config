@@ -9,3 +9,6 @@ resolution_h: 600
 
 # Preload
 run_warm: 1
+
+# Debug
+enable_debug: 0

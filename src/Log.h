@@ -22,9 +22,12 @@ public:
 	Log(int level);
 	
 	~Log();
+	
+	static void setDebug(bool status);
 
 private:
 	static std::mutex print_mutex_;
+	static bool enable_debug_;
 	int level_;
 };
 

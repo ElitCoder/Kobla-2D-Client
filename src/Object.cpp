@@ -93,6 +93,8 @@ array<double, 2> ObjectInformation::getCollisionScale() const {
 	Object
 */
 
+Object::Object() {}
+
 // Static since translation doesn't need an instance
 int Object::translateObjectTypeToCollision(int type) {
 	switch (type) {
@@ -117,10 +119,6 @@ void Object::load(int id) {
 	
 	image_.scale(Base::engine().getObjectInformation(id).getScale());
 	
-	// Set animation speed based on movement speed (this fits the animated player for now)
-	double frame_time = (1 / moving_speed_) * 10;
-	image_.internal().setFrameTime(sf::seconds(frame_time));
-	
 	object_id_ = id;
 }
 
@@ -141,6 +139,8 @@ void Object::startMoving(int direction, bool tell_server) {
 	if (tell_server) {
 		auto packet = PacketCreator::move(x_, y_, direction, true);
 		Base::network().send(packet);
+		
+		Log(DEBUG) << "Position " << x_ << " " << y_ << endl;
 	}
 	
 	moving_ = true;
@@ -149,8 +149,12 @@ void Object::startMoving(int direction, bool tell_server) {
 	original_x_ = x_;
 	original_y_ = y_;
 	
-	predetermined_distance_ = -1;
-	distance_moved_ = 0;
+	destination_x_ = -1;
+	destination_y_ = -1;
+	
+	reached_distance_x_ = false;
+	reached_distance_y_ = false;
+	determined_destination_ = false;
 	
 	started_moving_.start();
 }
@@ -188,45 +192,51 @@ bool Object::move(sf::Time& frame_time) {
 	double x = x_;
 	double y = y_;
 	
-	switch (direction_) {
-		case PLAYER_MOVE_UP: y -= pixels;
-			break;
-			
-		case PLAYER_MOVE_DOWN: y += pixels;
-			break;
-			
-		case PLAYER_MOVE_LEFT: x -= pixels;
-			break;
-			
-		case PLAYER_MOVE_RIGHT: x += pixels;
-			break;
-	}
+	double diff_x = destination_x_ - x;
+	double diff_y = destination_y_ - y;
 	
-	// Add to distance moved
-	distance_moved_ += pixels;
+	bool is_reaching_x = false;
+	bool is_reaching_y = false;
 	
-	if (predetermined_distance_ > 0 && distance_moved_ >= predetermined_distance_) {
-		// We had a predetermined distance to move, just set it to that value
+	if (determined_destination_) {
+		// Move to target
+		double diff_x_squared = pow(diff_x, 2);
+		double diff_y_squared = pow(diff_y, 2);
+		
+		double distance = diff_x_squared + diff_y_squared;
+		
+		double move_x = diff_x_squared / distance * pixels;
+		double move_y = diff_y_squared / distance * pixels;
+		
+		if (move_x >= abs(diff_x))
+			is_reaching_x = true;
+			
+		if (move_y >= abs(diff_y))
+			is_reaching_y = true;
+			
+		if (diff_x < 0)
+			x -= move_x;
+		else
+			x += move_x;
+		
+		if (diff_y < 0)
+			y -= move_y;
+		else
+			y += move_y;
+	} else {
 		switch (direction_) {
-			case PLAYER_MOVE_UP: y = original_y_ - predetermined_distance_;
+			case PLAYER_MOVE_UP: y -= pixels;
 				break;
 				
-			case PLAYER_MOVE_DOWN: y = original_y_ + predetermined_distance_;
+			case PLAYER_MOVE_DOWN: y += pixels;
 				break;
 				
-			case PLAYER_MOVE_LEFT: x = original_x_ - predetermined_distance_;
+			case PLAYER_MOVE_LEFT: x -= pixels;
 				break;
 				
-			case PLAYER_MOVE_RIGHT: x = original_x_ + predetermined_distance_;
+			case PLAYER_MOVE_RIGHT: x += pixels;
 				break;
 		}
-		
-		setPosition(x, y);
-		
-		// Stop moving since the Server defined walking length
-		stopMoving(false);
-		
-		return true;
 	}
 	
 	// Test new position with collisions
@@ -238,6 +248,23 @@ bool Object::move(sf::Time& frame_time) {
 		// Did not work, revert to old values
 		image_.position(x_, y_);
 		return false;
+	}
+	
+	if (determined_destination_) {
+		if (is_reaching_x)
+			reached_distance_x_ = true;
+		
+		if (is_reaching_y)
+			reached_distance_y_ = true;
+		
+		if (reached_distance_x_ && reached_distance_y_) {
+			setPosition(destination_x_, destination_y_);
+			
+			// Stop moving since the Server defined position
+			stopMoving(false);
+			
+			return true;
+		}
 	}
 		
 	setPosition(x, y);
@@ -255,6 +282,11 @@ size_t Object::getID() const {
 
 void Object::setMovingSpeed(double speed) {
 	moving_speed_ = speed;
+	
+	// Set animation speed based on movement speed (this fits the animated player for now)
+	double frame_time = (1 / moving_speed_) * 10 * Base::engine().getObjectInformation(object_id_).getAnimationSpeed();
+	
+	image_.internal().setFrameTime(sf::seconds(frame_time));
 }
 
 double Object::getX() const {
@@ -307,6 +339,7 @@ bool Object::isCollision(const sf::FloatRect& box) {
 	return box.intersects(image_.internal().getGlobalBounds());
 }
 
+#if 0
 void Object::setPredeterminedDistance(double distance) {
 	predetermined_distance_ = distance;
 }
@@ -314,6 +347,7 @@ void Object::setPredeterminedDistance(double distance) {
 double Object::getPredetermindedDistance() const {
 	return predetermined_distance_;
 }
+#endif
 
 bool Object::isMoving() const {
 	return moving_;
@@ -372,4 +406,13 @@ double Object::getDistanceTo(Object* object) {
 	double distance = pow(first_x - second_x, 2) + pow(first_y - second_y, 2);
 	
 	return sqrt(distance);
+}
+
+void Object::setDeterminedDestination(double x, double y) {
+	destination_x_ = x;
+	destination_y_ = y;
+	
+	reached_distance_x_ = false;
+	reached_distance_y_ = false;
+	determined_destination_ = true;
 }

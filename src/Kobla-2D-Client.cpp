@@ -81,8 +81,9 @@ static void process() {
 int main() {
 	printStart();
 	
-	Log(DEBUG) << "Parsing config\n";
 	Base::settings().parse("config");
+	
+	Log::setDebug(Base::settings().get<bool>("enable_debug", true));
 	
 	process();
 	

@@ -6,6 +6,7 @@
 using namespace std;
 
 mutex Log::print_mutex_;
+bool Log::enable_debug_ = true;
 
 Log::Log() {
 	level_ = NONE;
@@ -17,6 +18,9 @@ Log::Log(int level) {
 
 // TODO: Add functionality for writing to file, etc.
 Log::~Log() {
+	if (level_ == DEBUG && !enable_debug_)
+		return;
+
 	lock_guard<mutex> guard(print_mutex_);
 	
 	switch (level_) {
@@ -43,9 +47,13 @@ Log::~Log() {
 			
 		default: PRINT_STREAM << "[UNKNOWN ENUM]";
 	}
-	
+		
 	if (level_ != NONE)
 		PRINT_STREAM << " ";
-	
+
 	PRINT_STREAM << str() << FLUSH_STREAM;
+}
+
+void Log::setDebug(bool status) {
+	enable_debug_ = status;
 }
