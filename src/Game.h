@@ -23,6 +23,10 @@ class Packet;
 class Object;
 class TemporaryObject;
 
+namespace sf {
+	class Event;
+}
+
 class Game {
 public:
 	Game();

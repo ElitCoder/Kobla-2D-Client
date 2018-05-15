@@ -9,6 +9,10 @@ Map::Map() : map_loader_("data/maps") {
 	loaded_ = false;
 }
 
+tmx::MapLoader& Map::internal() {
+	return map_loader_;
+}
+
 void Map::load(int id) {
 	auto filename = Base::engine().getMapName(id);
 	

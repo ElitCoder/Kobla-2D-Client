@@ -46,8 +46,8 @@ static void process() {
 	
 	Log(DEBUG) << "Getting config options for network\n";
 	
-	const auto& hostname = Base::settings().get<string>("host", STANDARD_HOST);
-	const auto port = Base::settings().get<unsigned short>("port", STANDARD_PORT);
+	auto hostname = Base::settings().get<string>("host", STANDARD_HOST);
+	auto port = Base::settings().get<unsigned short>("port", STANDARD_PORT);
 	
 	Log(DEBUG) << "Starting network and connecting\n";
 	Base::network().start(hostname, port);
