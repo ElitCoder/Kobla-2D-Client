@@ -19,6 +19,7 @@ void GUI::draw(sf::RenderWindow& window) {
 	gui_.draw();
 }
 
+#if 0
 static array<long, 2> getMiddlePlacement(double outside_width, double outside_height,
 	double outside_x, double outside_y, double inside_width, double inside_height) {	
 	double x = outside_x + outside_width / 2 - inside_width / 2;
@@ -34,19 +35,21 @@ static array<long, 2> addTextToWidgetPlacement(double x, double y, double width,
 	
 	return {{ lround(p_x), lround(p_y) }};
 }
+#endif
 
 void GUI::load(int id) {
 	// Remove g++ warning
 	if (id) {}
 	
 	// Lower bar
-	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x, 50 };
+	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x, 40 };
 	auto chatbox = tgui::ChatBox::create();
 	
 	chatbox->setSize(chatbox_size[0], chatbox_size[1]);
 	chatbox->setPosition(0, gui_.getTarget()->getSize().y - chatbox_size[1]);
 	gui_.add(chatbox, "bottom_bar");
 
+	#if 0
 	// Top right bar (HP?)
 	unsigned int top_right_size[] = { 200, 80 };
 	auto top_right = tgui::ChatBox::create();
@@ -76,8 +79,9 @@ void GUI::load(int id) {
 		
 	label->setPosition(label_placement.front(), label_placement.back());
 	gui_.add(label, "hp_bar_text");
+	#endif
 	
-	gui_.setOpacity(0.6);
+	gui_.setOpacity(0.5);
 	
 	Log(DEBUG) << "GUI started at game status " << Base::game().getGameStatus() << endl;
 }
@@ -92,14 +96,18 @@ void GUI::update(const sf::View& view) {
 	load(0);
 	
 	// Update HP
-	updateHealthBar(Base::game().getPlayer().getFullHealth(), Base::game().getPlayer().getCurrentHealth());
+	//updateHealthBar(Base::game().getPlayer().getFullHealth(), Base::game().getPlayer().getCurrentHealth());
 }
 
+#if 0
 void GUI::updateHealthBar(double full, double current) {
+	#if 0
 	auto hp_bar = gui_.get<tgui::ProgressBar>("hp_bar");
 	auto percent = (current / full) * 100.0;
 	
 	Log(DEBUG) << "Percent: " << percent << endl;
 	
 	hp_bar->setValue(percent);
+	#endif
 }
+#endif

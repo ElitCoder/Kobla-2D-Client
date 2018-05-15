@@ -5,6 +5,8 @@
 #include "Object.h"
 #include "Text.h"
 
+#include <SFML/Graphics/RectangleShape.hpp>
+
 class Character : public Object {
 public:
 	virtual void draw(sf::RenderWindow& window) override;
@@ -15,6 +17,7 @@ public:
 	void updatePosition();
 	void setHealth(double full, double current);
 	void setName(const std::string& name);
+	void setShowHealth(bool status);
 	
 	double getFullHealth() const;
 	double getCurrentHealth() const;
@@ -25,9 +28,13 @@ public:
 	
 private:
 	Text text_;
+	sf::RectangleShape health_bar_;
+	sf::RectangleShape health_bar_fill_;
 	
 	double current_health_;
 	double full_health_;
+	
+	bool show_health_ = true;
 };
 
 #endif

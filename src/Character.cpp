@@ -9,6 +9,19 @@ using namespace std;
 void Character::setHealth(double full, double current) {
 	full_health_ = full;
 	current_health_ = current;
+	
+	health_bar_.setSize({ image_.internal().getGlobalBounds().width, 4 });
+	health_bar_.setFillColor(sf::Color::White);
+	health_bar_.setOutlineColor(sf::Color::Black);
+	health_bar_.setOutlineThickness(1);
+	
+	health_bar_fill_.setOutlineThickness(0);
+	health_bar_fill_.setFillColor(sf::Color::Red);
+	
+	double fill = current / full;
+	fill *= health_bar_.getSize().x;
+	
+	health_bar_fill_.setSize({ (float)fill, 4 });
 }
 
 double Character::getFullHealth() const {
@@ -54,18 +67,30 @@ void Character::setPosition(double x, double y) {
 	
 	// Set text to centered of player image
 	int text_x = image_size.width / 2 - text_size.width / 2;
-	int text_y = -text_size.height - 8;
+	int text_y = -text_size.height - 8 - health_bar_.getSize().y;
+	int health_y = -health_bar_.getSize().y;
 	
 	text_.position(x + text_x, y + text_y);
 	image_.position(x, y);
+	health_bar_.setPosition(x, y + health_y);
+	health_bar_fill_.setPosition(health_bar_.getPosition());
 		
 	x_ = x;
 	y_ = y;
 }
 
+void Character::setShowHealth(bool status) {
+	show_health_ = status;
+}
+
 void Character::draw(sf::RenderWindow& window) {
 	image_.draw(window);
 	text_.draw(window);
+	
+	if (show_health_) {
+		window.draw(health_bar_);
+		window.draw(health_bar_fill_);
+	}
 }
 
 void Character::load(int id) {

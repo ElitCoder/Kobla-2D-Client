@@ -337,7 +337,7 @@ void Game::handleSpawn() {
 	setGameStatus(GAME_STATUS_INGAME);
 	
 	// Set health bar to represent the player's health
-	Base::gui().updateHealthBar(player_.getFullHealth(), player_.getCurrentHealth());
+	//Base::gui().updateHealthBar(player_.getFullHealth(), player_.getCurrentHealth());
 }
 
 void Game::handleMove() {
@@ -384,6 +384,10 @@ void Game::handleAddPlayer() {
 	
 	player.setDirection(direction);
 	
+	// Don't show HP bar if it's a NPC
+	//if (player.getObjectType() == OBJECT_TYPE_NPC)
+	//	player.setShowHealth(false);
+	
 	if (moving) {
 		player.startMoving(direction, false);
 		
@@ -423,8 +427,8 @@ void Game::handleUpdateHealth() {
 	Character* character = getCharacter(id);
 	character->setHealth(full, current);
 	
-	if (character->getID() == player_.getID())
-		Base::gui().updateHealthBar(full, current);
+	//if (character->getID() == player_.getID())
+	//	Base::gui().updateHealthBar(full, current);
 }
 
 void Game::handleShoot() {
