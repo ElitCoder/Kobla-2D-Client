@@ -6,7 +6,7 @@
 
 #include <SFML/Graphics/Text.hpp>
 
-#define NORMAL_FONT		("CAPUT_TRIAL.ttf")
+#define NORMAL_FONT		("GROBOLD.ttf")
 #define NORMAL_FONT_ID	(0)
 
 class Text : public Entity {
