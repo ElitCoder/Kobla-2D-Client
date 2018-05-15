@@ -428,6 +428,10 @@ void Game::handleUpdateHealth() {
 	auto current = current_packet_->getFloat();
 	
 	Character* character = getCharacter(id);
+	
+	if (character == nullptr)
+		return;
+
 	character->setHealth(full, current);
 	
 	//if (character->getID() == player_.getID())
