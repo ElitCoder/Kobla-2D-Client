@@ -30,6 +30,13 @@ void ObjectInformation::setConfig(const Config& config) {
 		animation_lines_.push_back(config_.get<int>("animation_up", -1));
 		
 		animation_speed_ = 1.0 / config_.get<double>("animation_speed", animation_speed_);
+		
+		auto animation_size = config_.getAll<int>("animation_size", vector<int>());
+		
+		if (!animation_size.empty()) {
+			animation_size_width_ = animation_size.front();
+			animation_size_height_ = animation_size.at(1);
+		}
 	}
 	
 	collision_scale_x = config_.get<double>("collision_scale_x", 1);
@@ -60,8 +67,16 @@ const Animation& ObjectInformation::getAnimation(int direction) {
 				// Get size of texture
 				int size = lround((double)texture->getSize().y / (double)animation_lines_.size());
 				
-				for (size_t i = 0; i < texture->getSize().x; i += size)
-					direction.addFrame(sf::IntRect(i, line * size, size, size));
+				int size_x = size;
+				int size_y = size;
+				
+				if (animation_size_height_ > 0 && animation_size_width_ > 0) {
+					size_x = lround((double)texture->getSize().x / (double)animation_size_width_);
+					size_y = lround((double)texture->getSize().y / (double)animation_size_height_);
+				}
+				
+				for (size_t i = 0; i < texture->getSize().x; i += size_x)
+					direction.addFrame(sf::IntRect(i, line * size_y, size_x, size_y));
 					
 				animations_.push_back(direction);
 			}

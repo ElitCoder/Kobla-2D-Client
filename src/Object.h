@@ -53,6 +53,8 @@ private:
 	
 	std::vector<int> animation_lines_;
 	std::vector<Animation> animations_;
+	int animation_size_width_	= -1;
+	int animation_size_height_	= -1;
 	bool animated_				= false;
 	double animation_speed_		= 1;
 	int texture_id_				= -1;
