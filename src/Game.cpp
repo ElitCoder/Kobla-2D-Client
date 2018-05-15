@@ -413,8 +413,11 @@ Character* Game::getCharacter(int id) {
 		return player.getID() == (unsigned int)id;
 	});
 	
-	if (iterator == players_.end())
+	if (iterator == players_.end()) {
 		Log(WARNING) << "Character not found: " << id << endl;
+		
+		return nullptr;
+	}
 		
 	return &*iterator;
 }
@@ -459,19 +462,20 @@ void Game::handleText() {
 	auto ms = current_packet_->getInt();
 	auto id = current_packet_->getInt();
 	
-	Log(DEBUG) << text << endl;
+	//Log(DEBUG) << text << endl;
 	
-	auto* character = getCharacter(id);
+	//auto* character = getCharacter(id);
 	
-	if (character == nullptr)
-		return;
+	//if (character == nullptr)
+	//	return;
 	
 	Text draw_text;
 	draw_text.load(NORMAL_FONT_ID);
 	draw_text.set(text);
 	draw_text.size(18);
 	draw_text.color(sf::Color::White);
-	draw_text.position(character->getX() + 24, character->getY() - draw_text.getSize().height - 24);
+	//draw_text.position(character->getX() + 24, character->getY() - draw_text.getSize().height - 24);
+	draw_text.setOwner(id);
 	
 	text_.push_back({ draw_text, Timer(ms) });
 }

@@ -19,10 +19,15 @@ public:
 	void color(const sf::Color& color);
 	void position(int x, int y);
 	
+	void setOwner(int id);
+	int getOwner() const;
+	
 	sf::FloatRect getSize();
 	
 private:
 	sf::Text text_;
+	
+	int owner_ = -1;
 };
 
 #endif

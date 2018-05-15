@@ -39,11 +39,11 @@ public:
 	bool isCollision(const sf::FloatRect& bound, Object& object);
 	Map& getMap();
 	Character& getPlayer();
+	Character* getCharacter(int id);
 	
 	int getGameStatus();
 	
 private:
-	Character* getCharacter(int id);
 	Object* getActivateObject(Object* character);
 	
 	void removeCharacter(int id);
