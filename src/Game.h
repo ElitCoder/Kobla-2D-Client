@@ -38,6 +38,7 @@ public:
 	
 	bool isCollision(const sf::FloatRect& bound, Object& object);
 	Map& getMap();
+	Character& getPlayer();
 	
 	int getGameStatus();
 	

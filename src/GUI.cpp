@@ -90,6 +90,9 @@ void GUI::update(const sf::View& view) {
 	
 	// Load the GUI again
 	load(0);
+	
+	// Update HP
+	updateHealthBar(Base::game().getPlayer().getFullHealth(), Base::game().getPlayer().getCurrentHealth());
 }
 
 void GUI::updateHealthBar(double full, double current) {

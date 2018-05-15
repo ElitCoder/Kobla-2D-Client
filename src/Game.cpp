@@ -266,6 +266,10 @@ Map& Game::getMap() {
 	return map_;
 }
 
+Character& Game::getPlayer() {
+	return player_;
+}
+
 Object* Game::getActivateObject(Object* character) {
 	// Find closest object from centre - centre
 	// Only NPCs for now
