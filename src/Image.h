@@ -13,7 +13,7 @@ public:
 	virtual void load(int id) override;
 	AnimatedSprite& internal();
 	
-	sf::FloatRect getSize();
+	sf::FloatRect getSize() const;
 	
 	void position(int x, int y);
 	void scale(double value);

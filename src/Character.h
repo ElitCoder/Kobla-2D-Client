@@ -26,6 +26,8 @@ public:
 	double getMiddleX();
 	double getMiddleY();
 	
+	sf::FloatRect getChatPosition() const;
+	
 private:
 	Text text_;
 	sf::RectangleShape health_bar_;

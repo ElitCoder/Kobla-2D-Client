@@ -17,7 +17,8 @@ enum {
 	HEADER_SHOOT,
 	HEADER_HIT,
 	HEADER_ACTIVATE,
-	HEADER_TEXT
+	HEADER_TEXT,
+	HEADER_CHAT
 };
 
 class Packet;
@@ -32,6 +33,7 @@ public:
 	static Packet shoot();
 	static Packet hit(int object_id, int hit_id);
 	static Packet activate(Object* object);
+	static Packet chat(const std::string& message);
 };
 
 #endif

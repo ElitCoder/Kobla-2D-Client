@@ -22,7 +22,7 @@ public:
 	void setOwner(int id);
 	int getOwner() const;
 	
-	sf::FloatRect getSize();
+	sf::FloatRect getSize() const;
 	
 private:
 	sf::Text text_;

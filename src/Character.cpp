@@ -102,3 +102,17 @@ void Character::load(int id) {
 	
 	object_id_ = id;
 }
+
+sf::FloatRect Character::getChatPosition() const {
+	auto image_size = image_.getSize();
+	auto text_size = text_.getSize();
+	
+	int text_y = -text_size.height - 8 - health_bar_.getSize().y;
+	
+	sf::FloatRect position;
+	
+	position.left = getX() + image_size.width / 2;
+	position.top = getY() + text_y;
+	
+	return position;
+}

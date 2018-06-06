@@ -20,8 +20,10 @@ void Text::draw(sf::RenderWindow& window) {
 		// If the owner is dead, don't render the text
 		if (owner == nullptr)
 			return;
-			
-		position(owner->getX() + 24, owner->getY() - getSize().height - 24);
+		
+		auto text_position = owner->getChatPosition();
+		
+		position(text_position.left, text_position.top - getSize().height);
 	}
 	
 	window.draw(text_);
@@ -43,7 +45,7 @@ void Text::position(int x, int y) {
 	text_.setPosition(x, y);
 }
 
-sf::FloatRect Text::getSize() {
+sf::FloatRect Text::getSize() const {
 	return text_.getGlobalBounds();
 }
 

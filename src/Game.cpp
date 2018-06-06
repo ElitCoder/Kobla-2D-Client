@@ -184,6 +184,9 @@ bool Game::input(sf::Event& event) {
 						// Tell Server we want to activate something
 						Base::network().send(PacketCreator::activate(activate));
 					}
+				} else if (event.key.code == sf::Keyboard::Enter) {
+					// Start chatting
+					setGameStatus(GAME_STATUS_CHATTING);
 				}
 				
 				break;
@@ -199,6 +202,46 @@ bool Game::input(sf::Event& event) {
 	} else if (getGameStatus() == GAME_STATUS_LOGINSCREEN) {
 		// Enable text input
 		switch (event.type) {
+			default: handled = false;
+		}
+	} else if (getGameStatus() == GAME_STATUS_CHATTING) {
+		// Chatting
+		switch (event.type) {
+			case sf::Event::TextEntered: {
+				if (event.text.unicode >= 128 || (char)event.text.unicode == 13 /* CR */)
+					break;
+					
+				// Backspace
+				if (event.text.unicode == '\b') {
+					if (!chatting_.empty())
+						chatting_.pop_back();
+				} else {
+					chatting_ += (char)event.text.unicode;
+				}
+				
+				break;
+			}
+			
+			case sf::Event::KeyPressed: {
+				// See if Enter or Esc is pressed
+				bool enter = event.key.code == sf::Keyboard::Enter;
+				bool esc = event.key.code == sf::Keyboard::Escape;
+				
+				// Send to Server
+				if (enter && !chatting_.empty())
+					Base::network().send(PacketCreator::chat(chatting_));
+				
+				if (enter || esc) {
+					// Disable chatting
+					setGameStatus(GAME_STATUS_INGAME);
+					
+					// Empty chatting_
+					chatting_.clear();
+				}
+				
+				break;
+			}
+			
 			default: handled = false;
 		}
 	}
@@ -414,7 +457,7 @@ Character* Game::getCharacter(int id) {
 	});
 	
 	if (iterator == players_.end()) {
-		Log(WARNING) << "Character not found: " << id << endl;
+		//Log(WARNING) << "Character not found: " << id << endl;
 		
 		return nullptr;
 	}
@@ -466,12 +509,10 @@ void Game::handleText() {
 	auto ms = current_packet_->getInt();
 	auto id = current_packet_->getInt();
 	
-	//Log(DEBUG) << text << endl;
-	
-	//auto* character = getCharacter(id);
-	
-	//if (character == nullptr)
-	//	return;
+	// Make sure that the owner does not have any other texts active
+	text_.erase(remove_if(text_.begin(), text_.end(), [&id] (auto& text) {
+		return text.first.getOwner() == id;
+	}), text_.end());
 	
 	Text draw_text;
 	draw_text.load(NORMAL_FONT_ID);

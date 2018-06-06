@@ -16,7 +16,8 @@ enum {
 enum {
 	GAME_STATUS_INGAME,
 	GAME_STATUS_LOGINSCREEN,
-	GAME_STATUS_NONE
+	GAME_STATUS_NONE,
+	GAME_STATUS_CHATTING
 };
 
 class Packet;
@@ -75,6 +76,8 @@ private:
 	// Current game status, see enum above
 	int game_status_;
 	bool paused_;
+	
+	std::string chatting_;
 };
 
 #endif

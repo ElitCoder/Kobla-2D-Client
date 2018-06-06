@@ -24,7 +24,7 @@ void Image::draw(sf::RenderWindow& window) {
 	window.draw(sprite_);
 }
 
-sf::FloatRect Image::getSize() {
+sf::FloatRect Image::getSize() const {
 	if (!loaded_)
 		return sf::FloatRect();
 		

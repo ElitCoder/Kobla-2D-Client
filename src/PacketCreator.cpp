@@ -68,3 +68,12 @@ Packet PacketCreator::activate(Object* object) {
 	
 	return packet;
 }
+
+Packet PacketCreator::chat(const string& message) {
+	Packet packet;
+	packet.addHeader(HEADER_CHAT);
+	packet.addString(message);
+	packet.finalize();
+	
+	return packet;
+}
