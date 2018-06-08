@@ -1,10 +1,10 @@
 Kobla-2D-Client
 
-Game client for Kobla, rebase under development.
+Game client for Kobla-2D.
 
-ESSENTIALS:
-(Debian-based)
-./install.sh
+BUILD ESSENTIALS:
+apt: 	./install_apt.sh
+pacman:	./install_pacman.sh
 
 BUILDING:
 ./create.sh

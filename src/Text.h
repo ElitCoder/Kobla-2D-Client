@@ -6,8 +6,12 @@
 
 #include <SFML/Graphics/Text.hpp>
 
-#define NORMAL_FONT		("GROBOLD.ttf")
-#define NORMAL_FONT_ID	(0)
+#define NORMAL_FONT			("GROBOLD.ttf")
+#define NORMAL_FONT_ID		(0)
+
+#define FONT_SIZE_NAME		(20)
+#define FONT_SIZE_CHAT		(18)
+#define FONT_SIZE_CHATBOX	(16)
 
 class Text : public Entity {
 public:

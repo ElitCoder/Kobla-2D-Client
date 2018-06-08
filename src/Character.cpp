@@ -37,7 +37,7 @@ void Character::setName(const string& name) {
 	
 	// Update display text
 	text_.set(name);
-	text_.size(20);
+	text_.size(FONT_SIZE_NAME);
 	text_.color(sf::Color::White);
 }
 
@@ -115,4 +115,8 @@ sf::FloatRect Character::getChatPosition() const {
 	position.top = getY() + text_y;
 	
 	return position;
+}
+
+const string& Character::getName() const {
+	return name_;
 }

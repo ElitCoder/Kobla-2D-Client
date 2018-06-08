@@ -21,6 +21,7 @@ public:
 	
 	double getFullHealth() const;
 	double getCurrentHealth() const;
+	const std::string& getName() const;
 	
 	// Used for rendering
 	double getMiddleX();

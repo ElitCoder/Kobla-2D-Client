@@ -17,17 +17,7 @@ git clone https://github.com/texus/TGUI.git
 cd TGUI/
 cmake . && make -j $cores
 sudo make install
-
-# temp fix for cmake copying error
-sudo cp lib/libtgui.so* /usr/local/lib/
-
 cd ../
-echo "TGUI was installed, with a workaround"
-
-# move libs to PATH
-sudo cp /usr/local/lib/libtmx-loader.so /usr/lib/
-sudo cp /usr/local/lib/libpugi.so /usr/lib/
-sudo cp /usr/local/lib/libtgui.so* /usr/lib/
 
 # cleanup
 rm -rf sfml-tmxloader

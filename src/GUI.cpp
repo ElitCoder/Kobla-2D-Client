@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "Base.h"
 #include "Game.h"
+#include "Engine.h"
 
 using namespace std;
 
@@ -19,75 +20,74 @@ void GUI::draw(sf::RenderWindow& window) {
 	gui_.draw();
 }
 
-#if 0
-static array<long, 2> getMiddlePlacement(double outside_width, double outside_height,
-	double outside_x, double outside_y, double inside_width, double inside_height) {	
-	double x = outside_x + outside_width / 2 - inside_width / 2;
-	double y = outside_y + outside_height / 2 - inside_height / 2;
-	
-	return {{ lround(x), lround(y) }};
-}
-
-static array<long, 2> addTextToWidgetPlacement(double x, double y, double width,
-	double text_width, double text_height) {
-	double p_x = x + width / 2 - text_width / 2;
-	double p_y = y - text_height - 4;
-	
-	return {{ lround(p_x), lround(p_y) }};
-}
-#endif
-
 void GUI::load(int id) {
 	// Remove g++ warning
 	if (id) {}
 	
 	// Lower bar
-	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x, 40 };
+	unsigned int lower_bar_size[] = { gui_.getTarget()->getSize().x, 40 };
+	
+	auto lower_bar = tgui::ChatBox::create();
+	lower_bar->setSize(lower_bar_size[0], lower_bar_size[1]);
+	lower_bar->setPosition(0, gui_.getTarget()->getSize().y - lower_bar_size[1]);
+	
+	gui_.add(lower_bar, "lower_bar");
+	
+	// Chatbox
+	unsigned int chatbox_size[] = { gui_.getTarget()->getSize().x / 2, 100 };
+	
 	auto chatbox = tgui::ChatBox::create();
-	
 	chatbox->setSize(chatbox_size[0], chatbox_size[1]);
-	chatbox->setPosition(0, gui_.getTarget()->getSize().y - chatbox_size[1]);
-	gui_.add(chatbox, "bottom_bar");
-
-	#if 0
-	// Top right bar (HP?)
-	unsigned int top_right_size[] = { 200, 80 };
-	auto top_right = tgui::ChatBox::create();
+	chatbox->setTextSize(FONT_SIZE_CHATBOX);
+	chatbox->setPosition(0, lower_bar->getPosition().y - chatbox_size[1]);
+	chatbox->setLinesStartFromTop(true);
 	
-	top_right->setSize(top_right_size[0], top_right_size[1]);
-	top_right->setPosition(/*gui_.getTarget()->getSize().x - top_right_size[0]*/ 0, 0);
-	gui_.add(top_right, "top_right");
+	gui_.add(chatbox, "chatbox");
 	
-	// Add HP bar
-	unsigned int hp_bar_size[] = { 100, 20 };
-	auto hp_bar_placement = getMiddlePlacement(top_right_size[0], top_right_size[1], top_right->getPosition().x,
-		top_right->getPosition().y, hp_bar_size[0], hp_bar_size[1]);
+	// Area behind chat_input
+	unsigned int chat_input_size[] = { static_cast<unsigned int>(lround(chatbox->getSize().x)), chatbox->getTextSize() };
+	unsigned int chat_input_area_size[] = { static_cast<unsigned int>(lround(chatbox->getSize().x)), chatbox->getTextSize() };
+	auto chat_input_area = tgui::ChatBox::create();
+	chat_input_area->setSize(chat_input_area_size[0], chat_input_area_size[1]);
+	chat_input_area->setTextSize(FONT_SIZE_CHATBOX);
+	chat_input_area->setPosition(0, chatbox->getPosition().y - chat_input_size[1]);
 	
-	auto hp_bar = tgui::ProgressBar::create();
-	hp_bar->setPosition(hp_bar_placement[0], hp_bar_placement[1] + 20);
-	hp_bar->setSize(hp_bar_size[0], hp_bar_size[1]);
-	hp_bar->setValue(100);
-	gui_.add(hp_bar, "hp_bar");
+	gui_.add(chat_input_area, "chat_input_area");
 	
-	// Add label to HP bar
-	auto label = tgui::Label::create();
-	label->setText("Health");
-	label->setTextSize(18);
+	// Input text to chatbox
+	auto chat_input = tgui::Label::create();
+	chat_input->setSize(chat_input_size[0], chat_input_size[1]);
+	chat_input->setTextSize(FONT_SIZE_CHATBOX);
+	chat_input->setPosition(0, chatbox->getPosition().y - chat_input_size[1]);
 	
-	auto label_placement = addTextToWidgetPlacement(hp_bar->getPosition().x, hp_bar->getPosition().y,
-		hp_bar_size[0], label->getSize().x, label->getSize().y);
-		
-	label->setPosition(label_placement.front(), label_placement.back());
-	gui_.add(label, "hp_bar_text");
-	#endif
+	gui_.add(chat_input, "chat_input");
 	
-	gui_.setOpacity(0.5);
+	gui_.setFont(*Base::engine().getFont(NORMAL_FONT));
+	gui_.setOpacity(0.66);
 	
 	Log(DEBUG) << "GUI started at game status " << Base::game().getGameStatus() << endl;
 }
 
 // Update sizes after resize window to avoid auto re-scale
 void GUI::update(const sf::View& view) {
+	// Save chat_input text
+	auto chat_input = gui_.get<tgui::Label>("chat_input");
+	auto chatbox = gui_.get<tgui::ChatBox>("chatbox");
+	string input_text;
+	vector<string> chats;
+	
+	if (chat_input != nullptr)
+		input_text = chat_input->getText();
+		
+	if (chatbox != nullptr) {
+		size_t i = 0;
+		
+		while (!string(chatbox->getLine(i)).empty()) {
+			chats.push_back(string(chatbox->getLine(i)));
+			i++;
+		}
+	}
+		
 	// Update the view and remove the current widgets
 	gui_.setView(view);
 	gui_.removeAllWidgets();
@@ -95,19 +95,30 @@ void GUI::update(const sf::View& view) {
 	// Load the GUI again
 	load(0);
 	
-	// Update HP
-	//updateHealthBar(Base::game().getPlayer().getFullHealth(), Base::game().getPlayer().getCurrentHealth());
+	chat_input = gui_.get<tgui::Label>("chat_input");
+	chatbox = gui_.get<tgui::ChatBox>("chatbox");
+	
+	chat_input->setText(input_text);
+	
+	for (auto& message : chats)
+		chatbox->addLine(message);
 }
 
-#if 0
-void GUI::updateHealthBar(double full, double current) {
-	#if 0
-	auto hp_bar = gui_.get<tgui::ProgressBar>("hp_bar");
-	auto percent = (current / full) * 100.0;
+void GUI::addChatText(const string& who, const string& message) {
+	auto chatbox = gui_.get<tgui::ChatBox>("chatbox");
 	
-	Log(DEBUG) << "Percent: " << percent << endl;
-	
-	hp_bar->setValue(percent);
-	#endif
+	if (chatbox == nullptr)
+		return;
+		
+	chatbox->addLine(who + ": " + message);
+	chat_.push_back(who + ": " + message);
 }
-#endif
+
+void GUI::setChatInput(const string& input) {
+	auto chat_input = gui_.get<tgui::Label>("chat_input");
+	
+	if (chat_input == nullptr)
+		return;
+		
+	chat_input->setText(input);	
+}

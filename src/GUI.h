@@ -20,10 +20,13 @@ public:
 	
 	tgui::Gui& internal();
 	
-	void updateHealthBar(double full, double current);
+	void addChatText(const std::string& who, const std::string& message);
+	void setChatInput(const std::string& input);
 	
 private:
 	tgui::Gui gui_;
+	
+	std::vector<std::string> chat_;
 };
 
 #endif

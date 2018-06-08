@@ -184,7 +184,7 @@ bool Game::input(sf::Event& event) {
 						// Tell Server we want to activate something
 						Base::network().send(PacketCreator::activate(activate));
 					}
-				} else if (event.key.code == sf::Keyboard::Enter) {
+				} else if (event.key.code == sf::Keyboard::Return) {
 					// Start chatting
 					setGameStatus(GAME_STATUS_CHATTING);
 				}
@@ -219,12 +219,14 @@ bool Game::input(sf::Event& event) {
 					chatting_ += (char)event.text.unicode;
 				}
 				
+				Base::gui().setChatInput(chatting_);
+				
 				break;
 			}
 			
 			case sf::Event::KeyPressed: {
 				// See if Enter or Esc is pressed
-				bool enter = event.key.code == sf::Keyboard::Enter;
+				bool enter = event.key.code == sf::Keyboard::Return;
 				bool esc = event.key.code == sf::Keyboard::Escape;
 				
 				// Send to Server
@@ -237,6 +239,7 @@ bool Game::input(sf::Event& event) {
 					
 					// Empty chatting_
 					chatting_.clear();
+					Base::gui().setChatInput(chatting_);
 				}
 				
 				break;
@@ -517,10 +520,19 @@ void Game::handleText() {
 	Text draw_text;
 	draw_text.load(NORMAL_FONT_ID);
 	draw_text.set(text);
-	draw_text.size(18);
+	draw_text.size(FONT_SIZE_CHAT);
 	draw_text.color(sf::Color::White);
 	//draw_text.position(character->getX() + 24, character->getY() - draw_text.getSize().height - 24);
 	draw_text.setOwner(id);
 	
 	text_.push_back({ draw_text, Timer(ms) });
+	
+	string owner = "Ghost";
+	
+	auto* character = getCharacter(id);
+	
+	if (character != nullptr)
+		owner = character->getName();
+		
+	Base::gui().addChatText(owner, text);
 }
