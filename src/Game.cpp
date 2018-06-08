@@ -80,6 +80,10 @@ void Game::logic(sf::Clock& frame_clock) {
 	
 	for (auto& object : objects_) {
 		if (!object.move(frame_time)) {
+			// It's not possible to hit yourself
+			if (g_last_collision_id_ == object.getOwner())
+				continue;
+				
 			// Tell the Server that we hit something if it's our bullet and the hit is not the map (g_last_collision_id_ > 0)
 			if (g_last_collision_id_ > 0)
 				if ((int)player_.getID() == object.getOwner())
@@ -261,7 +265,7 @@ void Game::resume() {
 }
 
 void Game::removeCharacter(int id) {
-	auto is_player = remove_if(players_.begin(), players_.end(), [&id] (auto& player) { return player.getID() == (unsigned)id; });
+	auto is_player = remove_if(players_.begin(), players_.end(), [&id] (auto& player) { return player.getID() == id; });
 	
 	if (is_player != players_.end())
 		players_.erase(is_player);
@@ -335,6 +339,21 @@ Object* Game::getActivateObject(Object* character) {
 	return target;
 }
 
+Object* Game::getObject(int id) {
+	if ((int)getPlayer().getID() == id)
+		return &getPlayer();
+		
+	for (auto& player : players_)
+		if (player.getID() == id)
+			return &player;
+			
+	for (auto& object : objects_)
+		if (object.getID() == id)
+			return &object;
+			
+	return nullptr;
+}
+
 static vector<bool> readCollisionInformation(Packet& packet) {
 	vector<bool> collisions;
 	auto collisions_size = packet.getInt();
@@ -395,10 +414,12 @@ void Game::handleMove() {
 	auto has_destination = current_packet_->getBool();
 	auto destination_x = current_packet_->getFloat();
 	auto destination_y = current_packet_->getFloat();
+	auto following = current_packet_->getBool();
+	auto following_id = current_packet_->getInt();
 	
-	// It's a player?
+	// It's a Player?
 	for (auto& player : players_) {
-		if (player.getID() != (unsigned int)id)
+		if (player.getID() != id)
 			continue;
 			
 		player.setPosition(x, y);	
@@ -408,10 +429,33 @@ void Game::handleMove() {
 			
 			if (has_destination)
 				player.setDeterminedDestination(destination_x, destination_y);
+				
+			player.setFollowing(following, following_id);
 		} else {
 			player.stopMoving(false);
 		}
 			
+		break;
+	}
+	
+	// It's a Object?
+	for (auto& object : objects_) {
+		if (object.getID() != id)
+			continue;
+			
+		object.setPosition(x, y);
+		
+		if (moving) {
+			object.startMoving(direction, false);
+			
+			if (has_destination)
+				object.setDeterminedDestination(destination_x, destination_y);
+				
+			object.setFollowing(following, following_id);
+		} else {
+			object.stopMoving(false);
+		}
+		
 		break;
 	}
 }
@@ -422,6 +466,8 @@ void Game::handleAddPlayer() {
 	auto has_destination = current_packet_->getBool();
 	auto destination_x = current_packet_->getFloat();
 	auto destination_y = current_packet_->getFloat();
+	auto following = current_packet_->getBool();
+	auto following_id = current_packet_->getInt();
 	
 	players_.emplace_back();
 	auto& player = players_.back();
@@ -439,6 +485,8 @@ void Game::handleAddPlayer() {
 		
 		if (has_destination)
 			player.setDeterminedDestination(destination_x, destination_y);
+			
+		player.setFollowing(following, following_id);
 	} else {
 		player.stopMoving(false);
 	}
@@ -452,11 +500,11 @@ void Game::handleRemove() {
 }
 
 Character* Game::getCharacter(int id) {
-	if (player_.getID() == (unsigned int)id)
+	if (player_.getID() == id)
 		return &player_;
 		
 	auto iterator = find_if(players_.begin(), players_.end(), [&id] (auto& player) {
-		return player.getID() == (unsigned int)id;
+		return player.getID() == id;
 	});
 	
 	if (iterator == players_.end()) {

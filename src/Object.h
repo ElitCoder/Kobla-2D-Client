@@ -71,19 +71,20 @@ public:
 	virtual void load(int id) override;
 	
 	virtual void setPosition(double x, double y);
-	void setID(size_t id);
+	void setID(int id);
 	void setMovingSpeed(double speed);
 	void setCollisions(const std::vector<bool>& collisions);
 	void setColliding(bool status);
 	void setObjectType(int type);
 	void setDirection(int direction);
 	void setDeterminedDestination(double x, double y);
+	void setFollowing(bool status, int id = -1);
 	
 	void startMoving(int direction, bool tell_server);
 	bool move(sf::Time& frame_time);
 	void stopMoving(bool tell_server);
 	
-	size_t getID() const;
+	int getID() const;
 	double getX() const;
 	double getY() const;
 	bool getCollision(int type) const;
@@ -94,6 +95,7 @@ public:
 	bool isCollision(const sf::FloatRect& box);
 	bool isMoving() const;
 	bool isColliding() const;
+	bool isFollowing() const;
 	
 protected:
 	Object();
@@ -101,7 +103,7 @@ protected:
 	bool isPlayerInsideMap(const sf::FloatRect& box);
 	sf::FloatRect getCollisionBox(bool only_boots);
 	
-	size_t id_;
+	int id_;
 	std::string name_;
 	
 	double x_;
@@ -121,6 +123,8 @@ protected:
 	bool reached_distance_x_		= false;
 	bool reached_distance_y_		= false;
 	bool determined_destination_	= false;
+	bool following_					= false;
+	int following_id_				= -1;
 	
 	std::vector<bool> collisions_;
 	bool colliding_					= false;

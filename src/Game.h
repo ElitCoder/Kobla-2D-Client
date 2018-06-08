@@ -46,6 +46,8 @@ public:
 	Character& getPlayer();
 	Character* getCharacter(int id);
 	
+	Object* getObject(int id);
+	
 	int getGameStatus();
 	
 private:

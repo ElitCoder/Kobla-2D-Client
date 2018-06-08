@@ -170,6 +170,8 @@ void Object::startMoving(int direction, bool tell_server) {
 	reached_distance_x_ = false;
 	reached_distance_y_ = false;
 	determined_destination_ = false;
+	following_ = false;
+	following_id_ = -1;
 	
 	started_moving_.start();
 }
@@ -203,6 +205,21 @@ bool Object::move(sf::Time& frame_time) {
 	
 	auto time_elapsed = started_moving_.restart();
 	double pixels = moving_speed_ * time_elapsed;
+	
+	if (isFollowing()) {
+		Object* following = Base::game().getObject(following_id_);
+		
+		if (following == nullptr) {
+			Log(DEBUG) << "There is no one to follow, disable it\n";
+			
+			// Stop following
+			stopMoving(false);
+			
+			return false;
+		}
+		
+		setDeterminedDestination(following->getX(), following->getY());
+	}
 	
 	double x = x_;
 	double y = y_;
@@ -295,7 +312,7 @@ bool Object::move(sf::Time& frame_time) {
 		if (is_reaching_y)
 			reached_distance_y_ = true;
 		
-		if (reached_distance_x_ && reached_distance_y_) {
+		if (reached_distance_x_ && reached_distance_y_ && !isFollowing()) {
 			setPosition(destination_x_, destination_y_);
 			
 			// Stop moving since the Server defined position
@@ -310,11 +327,11 @@ bool Object::move(sf::Time& frame_time) {
 	return true;
 }
 
-void Object::setID(size_t id) {
+void Object::setID(int id) {
 	id_ = id;
 }
 
-size_t Object::getID() const {
+int Object::getID() const {
 	return id_;
 }
 
@@ -453,4 +470,13 @@ void Object::setDeterminedDestination(double x, double y) {
 	reached_distance_x_ = false;
 	reached_distance_y_ = false;
 	determined_destination_ = true;
+}
+
+void Object::setFollowing(bool status, int id) {
+	following_ = status;
+	following_id_ = id;
+}
+
+bool Object::isFollowing() const {
+	return following_;
 }
