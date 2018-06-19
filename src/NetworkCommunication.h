@@ -2,10 +2,8 @@
 #ifndef NETWORK_COMMUNICATION_H
 #define NETWORK_COMMUNICATION_H
 
-//#include "Packet.h"
-
 #include <thread>
-#include <deque>
+#include <list>
 #include <mutex>
 #include <condition_variable>
 
@@ -25,8 +23,10 @@ public:
     int getSocket() const;
     
     void send(const Packet& packet);
-    Packet* waitForPacketFast();
-    Packet& waitForPacket();
+    
+    void waitForPacket();
+    Packet* getPacket();
+    bool hasPacket();
     void completePacket();
     
     PartialPacket& getPartialPacket();
@@ -48,13 +48,13 @@ private:
     
     std::mutex incoming_mutex_;
     std::condition_variable incoming_cv_;
-    std::deque<Packet> incoming_packets_;
+    std::list<Packet> incoming_packets_;
     
     std::mutex outgoing_mutex_;
     std::condition_variable outgoing_cv_;
-    std::deque<Packet> outgoing_packets_;
+    std::list<Packet> outgoing_packets_;
     
-    std::deque<PartialPacket> partial_packets_;
+    std::list<PartialPacket> partial_packets_;
 };
 
 #endif

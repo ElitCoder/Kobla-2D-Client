@@ -5,11 +5,13 @@
 #include "Engine.h"
 #include "GUI.h"
 
+using namespace std;
+
 Config Base::settings_;
 NetworkCommunication Base::network_;
 Game Base::game_;
 Engine Base::engine_;
-GUI* Base::gui_ = nullptr;
+shared_ptr<GUI> Base::gui_;
 
 Config& Base::settings() {
 	return settings_;
@@ -32,14 +34,7 @@ GUI& Base::gui() {
 }
 
 void Base::createGUI(sf::RenderWindow& window) {
-	gui_ = new GUI(window);
+	gui_ = make_shared<GUI>(window);
 	
 	gui_->load(0);
-}
-
-void Base::destroyGUI() {
-	if (gui_ == nullptr)
-		return;
-		
-	delete gui_;	
 }

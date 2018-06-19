@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 class ObjectInformation;
 
@@ -33,8 +34,8 @@ public:
 	bool running();
 	void render();
 	
-	sf::Texture* getTexture(int id);
-	sf::Font* getFont(const std::string& filename);
+	std::shared_ptr<sf::Texture>& getTexture(int id);
+	std::shared_ptr<sf::Font>& getFont(const std::string& filename);
 	ObjectInformation& getObjectInformation(int id);
 	
 	std::string getMapName(int id);
@@ -53,8 +54,8 @@ private:
 	
 	sf::RenderWindow window_;
 	
-	std::vector<std::pair<std::string, sf::Texture*>> textures_;
-	std::vector<std::pair<std::string, sf::Font*>> fonts_;
+	std::vector<std::pair<std::string, std::shared_ptr<sf::Texture>>> textures_;
+	std::vector<std::pair<std::string, std::shared_ptr<sf::Font>>> fonts_;
 	std::vector<std::pair<std::string, ObjectInformation>> objects_;
 	
 	std::vector<std::pair<int, std::string>> map_names_;

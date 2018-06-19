@@ -15,14 +15,7 @@ extern mutex g_main_sync;
 
 Engine::Engine() {}
 
-Engine::~Engine() {
-	// Clean fonts and textures
-	for_each(textures_.begin(), textures_.end(), [] (auto& peer) { delete peer.second; });
-	for_each(fonts_.begin(), fonts_.end(), [] (auto& peer) { delete peer.second; });
-	
-	// Destroy GUI
-	Base::destroyGUI();
-}
+Engine::~Engine() {}
 
 void Engine::start() {
 	int w = Base::settings().get<int>("resolution_w", 640);
@@ -45,7 +38,7 @@ void Engine::checkEventNotHandled(sf::Event& event) {
 		case sf::Event::Closed: {
 			window_.close();
 			// Simple way to exit
-			exit(1);
+			quick_exit(-1);
 			break;
 		}
 		
@@ -97,34 +90,34 @@ void Engine::load() {
 	// TODO: Add things here if needed
 }
 
-sf::Texture* Engine::getTexture(int id) {
+shared_ptr<sf::Texture>& Engine::getTexture(int id) {
 	auto filename = getTextureName(id);
 	auto iterator = find_if(textures_.begin(), textures_.end(), [&filename] (auto& peer) { return peer.first == filename; });
 	
 	if (iterator == textures_.end()) {
-		sf::Texture* texture = new sf::Texture;
+		shared_ptr<sf::Texture> texture = make_shared<sf::Texture>();
 		
 		if (!texture->loadFromFile(getTexturePath() + filename))
 			Log(WARNING) << "Could not load texture " << filename << endl;
 			
 		textures_.push_back({ filename, texture });	
-		return texture;
+		return textures_.back().second;
 	} else {
 		return iterator->second;
 	}
 }
 
-sf::Font* Engine::getFont(const string& filename) {
+shared_ptr<sf::Font>& Engine::getFont(const string& filename) {
 	auto iterator = find_if(fonts_.begin(), fonts_.end(), [&filename] (auto& peer) { return peer.first == filename; });
 	
 	if (iterator == fonts_.end()) {
-		sf::Font* font = new sf::Font;
+		shared_ptr<sf::Font> font = make_shared<sf::Font>();
 		
 		if (!font->loadFromFile(getFontPath() + filename))
 			Log(WARNING) << "Could not load font " << filename << endl;
 			
 		fonts_.push_back({ filename, font });	
-		return font;
+		return fonts_.back().second;
 	} else {
 		return iterator->second;
 	}

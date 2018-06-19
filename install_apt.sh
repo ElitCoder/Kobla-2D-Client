@@ -19,6 +19,9 @@ cmake . && make -j $cores
 sudo make install
 cd ../
 
+# copy links to /usr/lib/ to ensure that they're on PATH
+sudo cp /usr/local/lib/libtgui.so* /usr/lib/
+
 # cleanup
 rm -rf sfml-tmxloader
 rm -rf TGUI

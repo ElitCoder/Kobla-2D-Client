@@ -56,7 +56,7 @@ const Animation& ObjectInformation::getAnimation(int direction) {
 		Log(WARNING) << "direction < 0!\n";
 		
 	if (animations_.empty()) {
-		auto* texture = Base::engine().getTexture(texture_id_);
+		auto& texture = Base::engine().getTexture(texture_id_);
 		
 		if (animated_) {
 			// Load animations

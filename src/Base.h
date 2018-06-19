@@ -2,6 +2,8 @@
 #ifndef BASE_H
 #define BASE_H
 
+#include <memory>
+
 class Config;
 class NetworkCommunication;
 class Game;
@@ -21,7 +23,6 @@ public:
 	static GUI& gui();
 	
 	static void createGUI(sf::RenderWindow& window);
-	static void destroyGUI();
 	
 private:
 	static Config settings_;
@@ -30,7 +31,7 @@ private:
 	static Engine engine_;
 	
 	// RenderWindow has to be passed into the GUI at construction time
-	static GUI* gui_;
+	static std::shared_ptr<GUI> gui_;
 };
 
 #endif

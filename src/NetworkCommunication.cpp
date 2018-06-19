@@ -96,10 +96,10 @@ static unsigned int processBuffer(const unsigned char *buffer, const unsigned in
 }
 
 static void receiveThread(NetworkCommunication& network) {
-    unsigned char *buffer = new unsigned char[NetworkConstants::BUFFER_SIZE];
+    array<unsigned char, NetworkConstants::BUFFER_SIZE> buffer;
     
     while (true) {
-        int received = recv(network.getSocket(), buffer, NetworkConstants::BUFFER_SIZE, 0);
+        int received = recv(network.getSocket(), buffer.data(), NetworkConstants::BUFFER_SIZE, 0);
         
         if(received <= 0) {
             Log(NETWORK) << "Receiving thread got error: " << strerror(errno) << endl;
@@ -110,13 +110,11 @@ static void receiveThread(NetworkCommunication& network) {
         int processed = 0;
     
         do {
-            processed += processBuffer(buffer + processed, received - processed, network.getPartialPacket());
+            processed += processBuffer(buffer.data() + processed, received - processed, network.getPartialPacket());
         } while (processed < received);
         
         network.moveCompletePartialPackets();
     }
-    
-    delete[] buffer;
     
     Log(NETWORK) << "Receiving thread lost connection to server!\n";
 }
@@ -125,7 +123,8 @@ static void sendThread(NetworkCommunication& network) {
     while (true) {
         Packet &packet = network.getOutgoingPacket();
         
-        int sent = send(network.getSocket(), packet.getData() + packet.getSent(), packet.getSize() - packet.getSent(), 0);
+        int sending = min((unsigned int)NetworkConstants::BUFFER_SIZE, packet.getSize() - packet.getSent());
+        int sent = send(network.getSocket(), packet.getData() + packet.getSent(), sending, 0);
         
         if(sent <= 0)
             break;
@@ -149,8 +148,8 @@ NetworkCommunication::~NetworkCommunication() {
     outgoing_packets_.clear();
     partial_packets_.clear();
     
-    receive_thread_.detach();
-    send_thread_.detach();
+    //receive_thread_.detach();
+    //send_thread_.detach();
 }
 
 void NetworkCommunication::start(const string& hostname, unsigned short port) {
@@ -160,17 +159,24 @@ void NetworkCommunication::start(const string& hostname, unsigned short port) {
     send_thread_ = thread(sendThread, ref(*this));
 }
 
-Packet& NetworkCommunication::waitForPacket() {
+void NetworkCommunication::waitForPacket() {
     unique_lock<mutex> lock(incoming_mutex_);
     incoming_cv_.wait(lock, [this] { return !incoming_packets_.empty(); });
-    
-    return incoming_packets_.front();
 }
 
-Packet* NetworkCommunication::waitForPacketFast() {
-    lock_guard<mutex> guard(incoming_mutex_);
+Packet* NetworkCommunication::getPacket() {
+    lock_guard<mutex> lock(incoming_mutex_);
     
-    return incoming_packets_.empty() ? nullptr : &incoming_packets_.front();
+    if (incoming_packets_.empty())
+        return nullptr;
+        
+    return &incoming_packets_.front();
+}
+
+bool NetworkCommunication::hasPacket() {
+    lock_guard<mutex> lock(incoming_mutex_);
+    
+    return !incoming_packets_.empty();
 }
 
 void NetworkCommunication::completePacket() {

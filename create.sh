@@ -25,6 +25,8 @@ else
 		cd bin/
 		# for debugging
 		#valgrind --track-origins=yes ./Kobla-2D-Client-Rebased
+		# helgrind
+		#valgrind --tool=helgrind ./Kobla-2D-Client-Rebased
 		# normal use
 		./Kobla-2D-Client-Rebased
 		cd ../
