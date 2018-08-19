@@ -25,3 +25,6 @@ sudo cp /usr/local/lib/libtgui.so* /usr/lib/
 # cleanup
 rm -rf sfml-tmxloader
 rm -rf TGUI
+
+# warn about zapcc
+echo "WARNING: zapcc needs to be manually installed to build, or change the Makefile to use g++"

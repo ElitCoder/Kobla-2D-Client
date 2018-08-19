@@ -6,42 +6,64 @@
 #include <list>
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 enum NetworkConstants {
-    BUFFER_SIZE = 4096
+    BUFFER_SIZE = 1048576
 };
 
 class Packet;
 class PartialPacket;
+
+class EventPipe {
+public:
+    explicit EventPipe();
+    ~EventPipe();
+    
+    void setPipe();
+    void resetPipe();
+    
+    int getSocket();
+    
+private:
+    int mPipes[2];
+    std::shared_ptr<std::mutex> event_mutex_;
+};
 
 class NetworkCommunication {
 public:
     NetworkCommunication();
     ~NetworkCommunication();
     
-    void start(const std::string& hostname, unsigned short port);
+    bool start(const std::string& hostname, unsigned short port, bool fast_fail = false, bool host = false);
+    void acceptConnection();
+    
     int getSocket() const;
     
-    void send(const Packet& packet);
+    void send(const Packet& packet, bool wait = false);
     
-    void waitForPacket();
-    Packet* getPacket();
-    bool hasPacket();
+    Packet* waitForPacket();
     void completePacket();
     
     PartialPacket& getPartialPacket();
     void moveCompletePartialPackets();
     
-    Packet& getOutgoingPacket();
+    Packet* getOutgoingPacket();
     void popOutgoingPacket();
     
+    EventPipe& getPipe();
+    void kill(bool safe = false);
+    
+    void setTerminateOnKill(bool status);
+
 private:
     bool hasFullPartialPacket() const;
     void pushPartialPacket(const PartialPacket& partial);
     PartialPacket& getFullPartialPacket();
     void popFullPartialPacket();
     
-    int socket_;
+    int socket_ = -1;
+    int host_socket_ = -1;
     
     std::thread receive_thread_;
     std::thread send_thread_;
@@ -54,7 +76,14 @@ private:
     std::condition_variable outgoing_cv_;
     std::list<Packet> outgoing_packets_;
     
+    std::condition_variable send_queue_cv_;
+    
     std::list<PartialPacket> partial_packets_;
+    
+    std::atomic<bool> shutdown_;
+    std::shared_ptr<EventPipe> pipe_;
+    
+    bool terminate_on_kill_ = false;
 };
 
 #endif

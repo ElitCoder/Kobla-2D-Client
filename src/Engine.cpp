@@ -11,6 +11,10 @@
 
 using namespace std;
 
+#ifdef WIN32
+constexpr auto quick_exit = _exit; // mingw32 does not support quick_exit for now
+#endif
+
 extern mutex g_main_sync;
 
 Engine::Engine() {}

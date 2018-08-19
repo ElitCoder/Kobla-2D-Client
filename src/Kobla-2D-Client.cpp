@@ -31,36 +31,16 @@ static void packetThread() {
 	
 	while (true) {
 		// Wait until the Server sends something
-		Base::network().waitForPacket();
+		auto* packet = Base::network().waitForPacket();
 		
+		if (packet == nullptr)
+			continue;
+
 		// Lock the game, we have a Packet
 		g_main_sync.lock();
-		while (Base::network().hasPacket()) {
-			auto* packet = Base::network().getPacket();
-			
-			if (packet == nullptr)
-				break;
-				
-			Base::game().process(*packet);
-			Base::network().completePacket();
-		}
-		g_main_sync.unlock();
-		
-		#if 0
-		auto& packet = Base::network().waitForPacket();
-		
-		g_main_sync.lock();
-		Base::game().process(packet);
+		Base::game().process(*packet);
 		Base::network().completePacket();
-		
-		while (Base::network().hasPacket()) {
-			auto& 
-			Base::game().process(packet);
-		}
 		g_main_sync.unlock();
-		
-		Base::network().completePacket();
-		#endif
 	}
 }
 

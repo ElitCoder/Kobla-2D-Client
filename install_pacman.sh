@@ -4,7 +4,7 @@
 cores=`grep --count ^processor /proc/cpuinfo`
 
 # install dependencies
-sudo pacman -Syy && sudo pacman -S --needed gcc sfml
+sudo pacman -Syy && sudo pacman -S --needed gcc sfml cmake zapcc
 
 # install sfml-tmxloader (own fork with map animations)
 git clone https://github.com/ElitCoder/sfml-tmxloader.git
