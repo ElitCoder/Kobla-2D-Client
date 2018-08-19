@@ -14,6 +14,15 @@ include_directories("${PROJECT_SOURCE_DIR}")
 # Find all source files
 file(GLOB files ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
+# Static build for Windows
+if (WIN32)
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+	set(BUILD_SHARED_LIBS OFF)
+	set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
+	
+	set(CMAKE_MODULE_PATH "/usr/i686-w64-mingw32/cmake/Modules" ${CMAKE_MODULE_PATH})
+endif (WIN32)
+
 # Dependencies
 find_package(Threads REQUIRED)
 find_package(SFML 2 COMPONENTS graphics window system REQUIRED)
@@ -31,14 +40,14 @@ add_executable(${PROJECT_NAME} ${files})
 
 # Link
 target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
-target_link_libraries(${PROJECT_NAME} tgui)
-target_link_libraries(${PROJECT_NAME} tmx-loader)
+target_link_libraries(${PROJECT_NAME} tgui)										# No FindTGUI.cmake
+target_link_libraries(${PROJECT_NAME} tmx-loader)								# No FINDTMX-Loader.cmake
+
+if (UNIX)
+	target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
+endif (UNIX)
 
 if (WIN32)
 	target_link_libraries(${PROJECT_NAME} ws2_32.lib)
-	#target_link_libraries(${PROJECT_NAME} iphlpapi.lib)
-	
-	# Static link for Windows
-	#set(CMAKE_EXE_LINKER_FLAGS "-static")
+	target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif (WIN32)
