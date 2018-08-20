@@ -4,8 +4,8 @@ port: 11000
 
 # Graphics
 vsync: 1
-resolution_w: 800
-resolution_h: 600
+resolution_w: 1024
+resolution_h: 768
 
 # Preload
 run_warm: 1
